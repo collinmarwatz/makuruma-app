@@ -1,16 +1,54 @@
-import './App.css'
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { AuthProvider } from './context/AuthContext'
+import { useAuth } from './hooks/useAuth'
+import Layout from './components/Layout'
+import Login from './pages/Login'
+import Dashboard from './pages/Dashboard'
+import Trucks from './pages/Trucks'
+import Users from './pages/Users'
+import PageLoader from './components/ui/PageLoader'
+import Staff from './pages/Staff'
+import Drivers from './pages/Drivers'
+
+
+function ProtectedRoute({ children }: { children: React.ReactNode }) {
+  const { user, isLoading } = useAuth()
+
+  if (isLoading) return <PageLoader />
+  if (!user) return <Navigate to="/login" replace />
+
+  return <>{children}</>
+}
+
+function AppRoutes() {
+  return (
+    <Routes>
+      <Route path="/login" element={<Login />} />
+
+      <Route
+        element={
+          <ProtectedRoute>
+            <Layout />
+          </ProtectedRoute>
+        }
+      >
+        <Route path="/" element={<Dashboard />} />
+        <Route path="/trucks" element={<Trucks />} />
+        <Route path="/users" element={<Users />} />
+        <Route path="/staff" element={<Staff />} />
+        <Route path="/drivers" element={<Drivers />} />
+      </Route>
+    </Routes>
+  )
+}
 
 function App() {
   return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
-      <div className="bg-white rounded-lg shadow-md p-6 w-full max-w-sm hover:shadow-xl transition">
-        <h2 className="text-xl font-bold text-gray-800">Truck #204</h2>
-        <p className="text-gray-500 mt-1">Status: On Route</p>
-        <button className="mt-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
-          View Details
-        </button>
-      </div>
-    </div>
+    <BrowserRouter>
+      <AuthProvider>
+        <AppRoutes />
+      </AuthProvider>
+    </BrowserRouter>
   )
 }
 
