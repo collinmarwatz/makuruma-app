@@ -1,8 +1,12 @@
-import { useState, type FormEvent } from 'react'
+import { useEffect, useState, type FormEvent } from 'react'
 import { createTruck, updateTruck } from '../services/truckService'
 import { createDocument } from '../services/documentService'
+import { fetchTrailers } from '../services/trailerService'
+import { fetchDrivers } from '../services/driverService'
 import { TRUCK_COMPLIANCE_TYPES } from '../constants/compliance'
 import type { Truck } from '../types/truck'
+import type { Trailer } from '../types/trailer'
+import type { Driver } from '../types/employee'
 import { Loader2 } from 'lucide-react'
 
 interface ComplianceFieldState {
@@ -30,9 +34,20 @@ function TruckForm({ truck, onSaved }: TruckFormProps) {
 
   const [regNo, setRegNo] = useState(truck?.reg_no ?? '')
   const [capacity, setCapacity] = useState(truck?.capacity ?? '')
+  const [trailerId, setTrailerId] = useState(truck?.trailer_id?.toString() ?? '')
+  const [driverId, setDriverId] = useState(truck?.driver_id?.toString() ?? '')
   const [compliance, setCompliance] = useState<ComplianceState>(initialComplianceState())
+
+  const [trailers, setTrailers] = useState<Trailer[]>([])
+  const [drivers, setDrivers] = useState<Driver[]>([])
+
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    fetchTrailers().then(setTrailers).catch(() => setTrailers([]))
+    fetchDrivers().then(setDrivers).catch(() => setDrivers([]))
+  }, [])
 
   function updateCompliance(key: string, field: keyof ComplianceFieldState, value: string | File | null) {
     setCompliance((prev) => ({
@@ -47,9 +62,16 @@ function TruckForm({ truck, onSaved }: TruckFormProps) {
     setIsSubmitting(true)
 
     try {
+      const payload = {
+        reg_no: regNo,
+        capacity,
+        trailer_id: trailerId || undefined,
+        driver_id: driverId || undefined,
+      }
+
       const savedTruck = isEditMode
-        ? await updateTruck(truck.id, { reg_no: regNo, capacity })
-        : await createTruck({ reg_no: regNo, capacity })
+        ? await updateTruck(truck.id, payload)
+        : await createTruck(payload)
 
       for (const { key } of TRUCK_COMPLIANCE_TYPES) {
         const { dueDate, attachment } = compliance[key]
@@ -78,7 +100,7 @@ function TruckForm({ truck, onSaved }: TruckFormProps) {
         </div>
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">Reg No</label>
           <input
@@ -99,6 +121,35 @@ function TruckForm({ truck, onSaved }: TruckFormProps) {
             required
             className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           />
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Assigned Trailer</label>
+          <select
+            value={trailerId}
+            onChange={(e) => setTrailerId(e.target.value)}
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          >
+            <option value="">— None —</option>
+            {trailers.map((t) => (
+              <option key={t.id} value={t.id}>{t.reg_no}</option>
+            ))}
+          </select>
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Assigned Driver</label>
+          <select
+            value={driverId}
+            onChange={(e) => setDriverId(e.target.value)}
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          >
+            <option value="">— None —</option>
+            {drivers.map((d) => (
+              <option key={d.id} value={d.id}>{d.full_name}</option>
+            ))}
+          </select>
         </div>
       </div>
 

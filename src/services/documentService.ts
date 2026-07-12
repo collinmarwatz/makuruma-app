@@ -6,7 +6,7 @@ interface CreateDocumentInput {
   attachment?: File | null
 }
 
-type DocumentableResource = 'trucks' | 'staff' | 'drivers'
+type DocumentableResource = 'trucks' | 'staff' | 'drivers' | 'trailers'
 
 export async function createDocument(
   resource: DocumentableResource,

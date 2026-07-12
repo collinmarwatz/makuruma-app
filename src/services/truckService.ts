@@ -5,18 +5,23 @@ export async function fetchTrucks(): Promise<Truck[]> {
   return apiClient('/trucks')
 }
 
-export async function createTruck(data: { reg_no: string; capacity: string }): Promise<Truck> {
-  return apiClient('/trucks', {
-    method: 'POST',
-    body: JSON.stringify(data),
-  })
+export async function createTruck(data: {
+  reg_no: string
+  capacity: string
+  trailer_id?: string
+  driver_id?: string
+}): Promise<Truck> {
+  return apiClient('/trucks', { method: 'POST', body: JSON.stringify(data) })
 }
 
-export async function updateTruck(id: number, data: { reg_no?: string; capacity?: string; status?: string }): Promise<Truck> {
-  return apiClient(`/trucks/${id}`, {
-    method: 'PUT',
-    body: JSON.stringify(data),
-  })
+export async function updateTruck(id: number, data: {
+  reg_no?: string
+  capacity?: string
+  status?: string
+  trailer_id?: string
+  driver_id?: string
+}): Promise<Truck> {
+  return apiClient(`/trucks/${id}`, { method: 'PUT', body: JSON.stringify(data) })
 }
 
 export async function deleteTruck(id: number): Promise<void> {

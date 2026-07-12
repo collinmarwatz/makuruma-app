@@ -2,10 +2,12 @@ import { NavLink } from 'react-router-dom'
 import { LayoutDashboard, Truck, Users as UsersIcon, LogOut, ChevronLeft, ChevronRight } from 'lucide-react'
 import { useAuth } from '../hooks/useAuth'
 import { UserCog, IdCard } from 'lucide-react'
+import { Container } from 'lucide-react'
 
 const navItems = [
   { to: '/', label: 'Dashboard', icon: LayoutDashboard },
   { to: '/trucks', label: 'Trucks', icon: Truck },
+  { to: '/trailers', label: 'Trailers', icon: Container },
   { to: '/staff', label: 'Staff', icon: UserCog },
   { to: '/drivers', label: 'Drivers', icon: IdCard },
   { to: '/users', label: 'Users', icon: UsersIcon },

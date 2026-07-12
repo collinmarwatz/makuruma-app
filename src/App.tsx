@@ -9,6 +9,7 @@ import Users from './pages/Users'
 import PageLoader from './components/ui/PageLoader'
 import Staff from './pages/Staff'
 import Drivers from './pages/Drivers'
+import Trailers from './pages/Trailers'
 
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -37,6 +38,7 @@ function AppRoutes() {
         <Route path="/users" element={<Users />} />
         <Route path="/staff" element={<Staff />} />
         <Route path="/drivers" element={<Drivers />} />
+        <Route path="/trailers" element={<Trailers />} />
       </Route>
     </Routes>
   )
