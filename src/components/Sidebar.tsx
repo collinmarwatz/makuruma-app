@@ -3,6 +3,8 @@ import { LayoutDashboard, Truck, Users as UsersIcon, LogOut, ChevronLeft, Chevro
 import { useAuth } from '../hooks/useAuth'
 import { UserCog, IdCard } from 'lucide-react'
 import { Container } from 'lucide-react'
+import { Building2, Store } from 'lucide-react'
+
 
 const navItems = [
   { to: '/', label: 'Dashboard', icon: LayoutDashboard },
@@ -10,6 +12,8 @@ const navItems = [
   { to: '/trailers', label: 'Trailers', icon: Container },
   { to: '/staff', label: 'Staff', icon: UserCog },
   { to: '/drivers', label: 'Drivers', icon: IdCard },
+  { to: '/clients', label: 'Clients', icon: Building2 },
+  { to: '/vendors', label: 'Vendors', icon: Store },
   { to: '/users', label: 'Users', icon: UsersIcon },
 ]
 

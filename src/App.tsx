@@ -10,7 +10,8 @@ import PageLoader from './components/ui/PageLoader'
 import Staff from './pages/Staff'
 import Drivers from './pages/Drivers'
 import Trailers from './pages/Trailers'
-
+import Clients from './pages/Clients'
+import Vendors from './pages/Vendors'
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, isLoading } = useAuth()
@@ -39,6 +40,8 @@ function AppRoutes() {
         <Route path="/staff" element={<Staff />} />
         <Route path="/drivers" element={<Drivers />} />
         <Route path="/trailers" element={<Trailers />} />
+        <Route path="/clients" element={<Clients />} />
+<Route path="/vendors" element={<Vendors />} />
       </Route>
     </Routes>
   )
