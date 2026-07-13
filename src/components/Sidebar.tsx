@@ -4,10 +4,15 @@ import { useAuth } from '../hooks/useAuth'
 import { UserCog, IdCard } from 'lucide-react'
 import { Container } from 'lucide-react'
 import { Building2, Store } from 'lucide-react'
+import { ClipboardList } from 'lucide-react'
+import logo from '../assets/logo.png'
+import { Route as RouteIcon } from 'lucide-react'
 
 
 const navItems = [
   { to: '/', label: 'Dashboard', icon: LayoutDashboard },
+  { to: '/bookings', label: 'Bookings', icon: ClipboardList },
+  { to: '/trips', label: 'Trips', icon: RouteIcon },
   { to: '/trucks', label: 'Trucks', icon: Truck },
   { to: '/trailers', label: 'Trailers', icon: Container },
   { to: '/staff', label: 'Staff', icon: UserCog },
@@ -33,20 +38,17 @@ function Sidebar({ isCollapsed, onToggle }: SidebarProps) {
       }`}
     >
       <div className={`px-4 py-5 border-b border-gray-100 flex items-center ${isCollapsed ? 'justify-center' : 'justify-between'}`}>
-        {!isCollapsed && (
-          <div>
-            <h1 className="text-lg font-bold text-gray-800">Makuruma</h1>
-            <p className="text-xs text-gray-400">Logistics Management</p>
-          </div>
-        )}
-        <button
-          onClick={onToggle}
-          className="p-1.5 text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors flex-shrink-0"
-          title={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-        >
-          {isCollapsed ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
-        </button>
-      </div>
+  {!isCollapsed && (
+    <img src={logo} alt="Makuruma Logistics" className="h-8" />
+  )}
+  <button
+    onClick={onToggle}
+    className="p-1.5 text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors flex-shrink-0"
+    title={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+  >
+    {isCollapsed ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
+  </button>
+</div>
 
       <nav className="flex-1 px-3 py-4 space-y-1">
         {navItems.map(({ to, label, icon: Icon }) => (
@@ -60,8 +62,8 @@ function Sidebar({ isCollapsed, onToggle }: SidebarProps) {
                 isCollapsed ? 'justify-center' : ''
               } ${
                 isActive
-                  ? 'bg-blue-50 text-blue-700'
-                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+  ? 'bg-teal-50 text-teal-700'
+  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
               }`
             }
           >

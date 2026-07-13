@@ -12,30 +12,30 @@ const statusColors: Record<Truck['status'], 'green' | 'yellow' | 'red' | 'gray'>
   decommissioned: 'red',
 }
 
-const expiryColors: Record<string, 'green' | 'yellow' | 'red' | 'gray'> = {
-  valid: 'green',
-  'expiring-soon': 'yellow',
-  expired: 'red',
-  unknown: 'gray',
-}
-
 function TruckCard({ truck }: TruckCardProps) {
+  const documentsExpiringSoon = truck.documents.filter(
+    (doc) => getExpiryStatus(doc) === 'expiring-soon' || getExpiryStatus(doc) === 'expired'
+  )
+
   return (
-    <div className="bg-white rounded-lg shadow-md p-6 w-full max-w-sm hover:shadow-xl transition">
-      <h2 className="text-xl font-bold text-gray-800">{truck.reg_no}</h2>
-      <p className="text-gray-500 mt-1">Capacity: {truck.capacity} tons</p>
-      <div className="mt-2">
+    <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow">
+      <div className="flex items-start justify-between mb-3">
+        <h2 className="text-lg font-bold text-gray-800">{truck.reg_no}</h2>
         <Badge label={truck.status} color={statusColors[truck.status]} />
       </div>
 
-      {truck.documents.length > 0 && (
-        <div className="mt-4 border-t pt-3 space-y-2">
-          {truck.documents.map((doc) => {
+      <p className="text-sm text-gray-500 mb-1">Capacity: {truck.capacity} tons</p>
+      <p className="text-sm text-gray-500 mb-1">Trailer: {truck.trailer?.reg_no ?? 'Not assigned'}</p>
+      <p className="text-sm text-gray-500 mb-3">Driver: {truck.driver?.full_name ?? 'Not assigned'}</p>
+
+      {documentsExpiringSoon.length > 0 && (
+        <div className="border-t border-gray-100 pt-3 space-y-1.5">
+          {documentsExpiringSoon.map((doc) => {
             const status = getExpiryStatus(doc)
             return (
-              <div key={doc.id} className="flex items-center justify-between text-sm">
-                <span className="text-gray-600">{doc.document_type}</span>
-                <Badge label={status} color={expiryColors[status]} />
+              <div key={doc.id} className="flex items-center justify-between text-xs">
+                <span className="text-gray-500">{doc.document_type}</span>
+                <Badge label={status} color={status === 'expired' ? 'red' : 'yellow'} />
               </div>
             )
           })}

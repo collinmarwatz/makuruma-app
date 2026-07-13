@@ -12,6 +12,9 @@ import Drivers from './pages/Drivers'
 import Trailers from './pages/Trailers'
 import Clients from './pages/Clients'
 import Vendors from './pages/Vendors'
+import Bookings from './pages/Bookings'
+import TripsOverview from './pages/TripsOverview'
+
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, isLoading } = useAuth()
@@ -41,7 +44,9 @@ function AppRoutes() {
         <Route path="/drivers" element={<Drivers />} />
         <Route path="/trailers" element={<Trailers />} />
         <Route path="/clients" element={<Clients />} />
-<Route path="/vendors" element={<Vendors />} />
+        <Route path="/vendors" element={<Vendors />} />
+        <Route path="/bookings" element={<Bookings />} />
+        <Route path="/trips" element={<TripsOverview />} />
       </Route>
     </Routes>
   )
