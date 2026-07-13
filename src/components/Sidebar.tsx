@@ -7,12 +7,14 @@ import { Building2, Store } from 'lucide-react'
 import { ClipboardList } from 'lucide-react'
 import logo from '../assets/logo.png'
 import { Route as RouteIcon } from 'lucide-react'
+import { MapPin } from 'lucide-react'
 
 
 const navItems = [
   { to: '/', label: 'Dashboard', icon: LayoutDashboard },
   { to: '/bookings', label: 'Bookings', icon: ClipboardList },
   { to: '/trips', label: 'Trips', icon: RouteIcon },
+  { to: '/tracking', label: 'Tracking', icon: MapPin },
   { to: '/trucks', label: 'Trucks', icon: Truck },
   { to: '/trailers', label: 'Trailers', icon: Container },
   { to: '/staff', label: 'Staff', icon: UserCog },

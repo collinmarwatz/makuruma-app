@@ -14,6 +14,8 @@ import Clients from './pages/Clients'
 import Vendors from './pages/Vendors'
 import Bookings from './pages/Bookings'
 import TripsOverview from './pages/TripsOverview'
+import Tracking from './pages/Tracking'
+
 
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -47,6 +49,7 @@ function AppRoutes() {
         <Route path="/vendors" element={<Vendors />} />
         <Route path="/bookings" element={<Bookings />} />
         <Route path="/trips" element={<TripsOverview />} />
+        <Route path="/tracking" element={<Tracking />} />
       </Route>
     </Routes>
   )
