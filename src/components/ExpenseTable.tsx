@@ -52,7 +52,7 @@ function ExpenseTable({ expenses, userRoleSlug, onEdit, onDelete, onApprove, onR
               </td>
               <td className="px-4 py-3 text-gray-600">{exp.creator.name}</td>
               <td className="px-4 py-3 text-gray-800 font-medium">
-                {parseFloat(exp.total_amount).toLocaleString()}
+                ${parseFloat(exp.total_amount).toLocaleString()}
               </td>
               <td className="px-4 py-3 text-gray-600">
   {exp.trip?.trip_number ?? exp.truck?.reg_no ?? '—'}

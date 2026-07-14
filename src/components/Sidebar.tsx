@@ -9,6 +9,8 @@ import logo from '../assets/logo.png'
 import { Route as RouteIcon } from 'lucide-react'
 import { MapPin } from 'lucide-react'
 import { Receipt } from 'lucide-react'
+import { FileText } from 'lucide-react'
+
 
 
 
@@ -24,6 +26,7 @@ const navItems = [
   { to: '/clients', label: 'Clients', icon: Building2 },
   { to: '/vendors', label: 'Vendors', icon: Store },
   { to: '/expenses', label: 'Expenses', icon: Receipt },
+  { to: '/invoices', label: 'Invoices', icon: FileText },
   { to: '/users', label: 'Users', icon: UsersIcon },
 ]
 

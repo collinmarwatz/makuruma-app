@@ -36,6 +36,8 @@ interface SelectedTruck {
   offloadingDate: string
   invoicedTransitWeight: string
   invoicedDetentionCharge: string
+  rate: string
+  quantity: string
 }
 
 function BookingForm({ trip, onSaved }: BookingFormProps) {
@@ -72,17 +74,16 @@ function BookingForm({ trip, onSaved }: BookingFormProps) {
       offloadingDate: bt.offloading_date ?? '',
       invoicedTransitWeight: bt.invoiced_transit_weight ?? '',
       invoicedDetentionCharge: bt.invoiced_detention_charge ?? '',
+      rate: bt.rate ?? '',
+      quantity: bt.quantity ?? '',
     })) ?? []
   )
 
   const [clientId, setClientId] = useState(goLeg?.client?.id.toString() ?? '')
-  const [rate, setRate] = useState(goLeg?.rate ?? '')
   const [eta, setEta] = useState(goLeg?.eta ?? '')
   const [location, setLocation] = useState(goLeg?.location ?? '')
   const [itemSn, setItemSn] = useState(goLeg?.item_sn ?? '')
   const [description, setDescription] = useState(goLeg?.description ?? '')
-  const [quantity, setQuantity] = useState(goLeg?.quantity ?? '')
-  const [amount, setAmount] = useState(goLeg?.amount ?? '')
 
   const [tripNumberInput, setTripNumberInput] = useState('')
   const [foundTrip, setFoundTrip] = useState<Trip | null>(null)
@@ -112,6 +113,8 @@ function BookingForm({ trip, onSaved }: BookingFormProps) {
         offloadingDate: '',
         invoicedTransitWeight: '',
         invoicedDetentionCharge: '',
+        rate: '',
+        quantity: '',
       },
     ])
   }
@@ -124,13 +127,10 @@ function BookingForm({ trip, onSaved }: BookingFormProps) {
 
   function resetLegFields() {
     setClientId('')
-    setRate('')
     setEta('')
     setLocation('')
     setItemSn('')
     setDescription('')
-    setQuantity('')
-    setAmount('')
     setSelectedTrucks([])
     setFoundTrip(null)
     setTripNumberInput('')
@@ -173,18 +173,17 @@ function BookingForm({ trip, onSaved }: BookingFormProps) {
       offloading_date: s.offloadingDate || undefined,
       invoiced_transit_weight: s.invoicedTransitWeight || undefined,
       invoiced_detention_charge: s.invoicedDetentionCharge || undefined,
+      rate: s.rate || undefined,
+      quantity: s.quantity || undefined,
     }))
 
     const legPayload = {
       trucks: truckAssignments,
       client_id: clientId || undefined,
-      rate: rate || undefined,
       eta: eta || undefined,
       location: location || undefined,
       item_sn: itemSn || undefined,
       description: description || undefined,
-      quantity: quantity || undefined,
-      amount: amount || undefined,
     }
 
     try {
@@ -301,6 +300,8 @@ function BookingForm({ trip, onSaved }: BookingFormProps) {
             <div className="mt-4 space-y-4">
               {selectedTrucks.map((s) => {
                 const truck = trucks.find((t) => t.id.toString() === s.truckId)
+                const computedAmount = (parseFloat(s.rate) || 0) * (parseFloat(s.quantity) || 0)
+
                 return (
                   <div key={s.truckId} className="bg-gray-50 rounded-lg p-3">
                     <p className="text-sm font-medium text-gray-700 mb-2">{truck?.reg_no}</p>
@@ -399,15 +400,42 @@ function BookingForm({ trip, onSaved }: BookingFormProps) {
                       </div>
                     </div>
 
-                    <div className="mt-3">
-                      <label className="block text-xs text-gray-500 mb-1">Invoiced Detention Charge</label>
-                      <input
-                        type="number"
-                        step="0.01"
-                        value={s.invoicedDetentionCharge}
-                        onChange={(e) => updateSelectedTruck(s.truckId, 'invoicedDetentionCharge', e.target.value)}
-                        className="w-full md:w-1/3 border border-gray-300 rounded-lg px-2 py-1.5 text-sm"
-                      />
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mt-3">
+                      <div>
+                        <label className="block text-xs text-gray-500 mb-1">Rate ($/ton)</label>
+                        <input
+                          type="number"
+                          step="0.01"
+                          value={s.rate}
+                          onChange={(e) => updateSelectedTruck(s.truckId, 'rate', e.target.value)}
+                          className="w-full border border-gray-300 rounded-lg px-2 py-1.5 text-sm"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs text-gray-500 mb-1">Quantity (tons)</label>
+                        <input
+                          type="number"
+                          step="0.01"
+                          value={s.quantity}
+                          onChange={(e) => updateSelectedTruck(s.truckId, 'quantity', e.target.value)}
+                          className="w-full border border-gray-300 rounded-lg px-2 py-1.5 text-sm"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs text-gray-500 mb-1">Invoiced Detention Charge</label>
+                        <input
+                          type="number"
+                          step="0.01"
+                          value={s.invoicedDetentionCharge}
+                          onChange={(e) => updateSelectedTruck(s.truckId, 'invoicedDetentionCharge', e.target.value)}
+                          className="w-full border border-gray-300 rounded-lg px-2 py-1.5 text-sm"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="mt-3 bg-blue-50 rounded-lg px-3 py-2 text-sm flex justify-between">
+                      <span className="text-blue-700">Amount</span>
+                      <span className="font-bold text-blue-800">${computedAmount.toLocaleString()}</span>
                     </div>
                   </div>
                 )
@@ -433,16 +461,6 @@ function BookingForm({ trip, onSaved }: BookingFormProps) {
           </select>
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Rate ($/mt)</label>
-          <input
-            type="number"
-            step="0.01"
-            value={rate}
-            onChange={(e) => setRate(e.target.value)}
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"
-          />
-        </div>
-        <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">ETA</label>
           <input
             type="date"
@@ -466,26 +484,6 @@ function BookingForm({ trip, onSaved }: BookingFormProps) {
             type="text"
             value={itemSn}
             onChange={(e) => setItemSn(e.target.value)}
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Quantity</label>
-          <input
-            type="number"
-            step="0.01"
-            value={quantity}
-            onChange={(e) => setQuantity(e.target.value)}
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Amount</label>
-          <input
-            type="number"
-            step="0.01"
-            value={amount}
-            onChange={(e) => setAmount(e.target.value)}
             className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"
           />
         </div>

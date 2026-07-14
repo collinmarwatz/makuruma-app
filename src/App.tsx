@@ -16,6 +16,8 @@ import Bookings from './pages/Bookings'
 import TripsOverview from './pages/TripsOverview'
 import Tracking from './pages/Tracking'
 import Expenses from './pages/Expenses'
+import Invoices from './pages/Invoices'
+
 
 
 
@@ -53,6 +55,7 @@ function AppRoutes() {
         <Route path="/trips" element={<TripsOverview />} />
         <Route path="/tracking" element={<Tracking />} />
         <Route path="/expenses" element={<Expenses />} />
+        <Route path="/invoices" element={<Invoices />} />
       </Route>
     </Routes>
   )

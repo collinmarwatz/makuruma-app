@@ -233,7 +233,7 @@ function ExpenseForm({ expense, onSaved }: ExpenseFormProps) {
       <div className="bg-gray-50 rounded-lg p-3 mb-6">
         <div className="flex justify-between items-center text-sm text-gray-500 mb-1">
           <span>Per-truck amount</span>
-          <span>{lineTotal.toLocaleString()} TZS</span>
+          <span>{lineTotal.toLocaleString()} $</span>
         </div>
         {truckMultiplier > 1 && (
           <div className="flex justify-between items-center text-sm text-gray-500 mb-1">
@@ -243,7 +243,7 @@ function ExpenseForm({ expense, onSaved }: ExpenseFormProps) {
         )}
         <div className="flex justify-between items-center border-t border-gray-200 pt-2 mt-1">
           <span className="text-sm font-medium text-gray-700">Total</span>
-          <span className="text-lg font-bold text-gray-800">{total.toLocaleString()} TZS</span>
+          <span className="text-lg font-bold text-gray-800">{total.toLocaleString()} $</span>
         </div>
       </div>
 

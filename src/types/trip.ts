@@ -16,19 +16,19 @@ export interface BookingTruck {
   offloading_date: string | null
   invoiced_transit_weight: string | null
   invoiced_detention_charge: string | null
+  rate: string | null
+  quantity: string | null
+  amount: string | null
 }
 
 export interface TripLeg {
   id: number
   direction: 'go' | 'return'
   client: Client | null
-  rate: string | null
   eta: string | null
   location: string | null
   item_sn: string | null
   description: string | null
-  quantity: string | null
-  amount: string | null
   booking_trucks: BookingTruck[]
 }
 
