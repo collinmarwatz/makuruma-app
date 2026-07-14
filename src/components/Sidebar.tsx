@@ -8,6 +8,8 @@ import { ClipboardList } from 'lucide-react'
 import logo from '../assets/logo.png'
 import { Route as RouteIcon } from 'lucide-react'
 import { MapPin } from 'lucide-react'
+import { Receipt } from 'lucide-react'
+
 
 
 const navItems = [
@@ -21,6 +23,7 @@ const navItems = [
   { to: '/drivers', label: 'Drivers', icon: IdCard },
   { to: '/clients', label: 'Clients', icon: Building2 },
   { to: '/vendors', label: 'Vendors', icon: Store },
+  { to: '/expenses', label: 'Expenses', icon: Receipt },
   { to: '/users', label: 'Users', icon: UsersIcon },
 ]
 
