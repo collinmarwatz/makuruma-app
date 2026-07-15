@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
 import type { TrackedTruck, Checkpoint, TrackingStatus } from '../types/tracking'
-import { fetchCheckpoints, updateTrackingStatus, upsertMilestone } from '../services/trackingService'
+import { fetchCheckpoints, updateTrackingStatus, upsertMilestone, updateTripDates, uploadProofOfDelivery } from '../services/trackingService'
 import { TRACKING_STATUS_OPTIONS } from '../constants/trackingStatus'
-import { Loader2, Check } from 'lucide-react'
+import { Loader2, Check, Upload, FileCheck } from 'lucide-react'
 
 interface TrackingDetailFormProps {
   truck: TrackedTruck
@@ -20,17 +20,26 @@ function toDatetimeLocal(value: string | null): string {
 }
 
 function TrackingDetailForm({ truck, onSaved }: TrackingDetailFormProps) {
+  const recentBooking = truck.booking_trucks?.[0] ?? null
+
   const [checkpoints, setCheckpoints] = useState<Checkpoint[]>([])
   const [location, setLocation] = useState(truck.current_location ?? '')
   const [status, setStatus] = useState<TrackingStatus>(truck.current_status)
   const [isSavingStatus, setIsSavingStatus] = useState(false)
   const [statusSaved, setStatusSaved] = useState(false)
 
+  const [actualLoadingDate, setActualLoadingDate] = useState(recentBooking?.actual_loading_date?.slice(0, 10) ?? '')
+  const [actualOffloadingDate, setActualOffloadingDate] = useState(recentBooking?.actual_offloading_date?.slice(0, 10) ?? '')
+  const [isSavingDates, setIsSavingDates] = useState(false)
+  const [datesSaved, setDatesSaved] = useState(false)
+
+  const [podFile, setPodFile] = useState<File | null>(null)
+  const [isUploadingPod, setIsUploadingPod] = useState(false)
+  const [podError, setPodError] = useState<string | null>(null)
+
   const [milestones, setMilestones] = useState<Record<number, MilestoneInput>>({})
   const [savingCheckpointId, setSavingCheckpointId] = useState<number | null>(null)
   const [savedCheckpointId, setSavedCheckpointId] = useState<number | null>(null)
-
-  const recentBooking = truck.booking_trucks?.[0] ?? null
 
   useEffect(() => {
     fetchCheckpoints().then((data) => {
@@ -48,10 +57,7 @@ function TrackingDetailForm({ truck, onSaved }: TrackingDetailFormProps) {
   }, [truck])
 
   function updateMilestoneField(checkpointId: number, field: keyof MilestoneInput, value: string) {
-    setMilestones((prev) => ({
-      ...prev,
-      [checkpointId]: { ...prev[checkpointId], [field]: value },
-    }))
+    setMilestones((prev) => ({ ...prev, [checkpointId]: { ...prev[checkpointId], [field]: value } }))
   }
 
   async function handleStatusSave() {
@@ -63,6 +69,37 @@ function TrackingDetailForm({ truck, onSaved }: TrackingDetailFormProps) {
       onSaved()
     } finally {
       setIsSavingStatus(false)
+    }
+  }
+
+  async function handleDatesSave() {
+    if (!recentBooking) return
+    setIsSavingDates(true)
+    setDatesSaved(false)
+    try {
+      await updateTripDates(recentBooking.id, {
+        actual_loading_date: actualLoadingDate || undefined,
+        actual_offloading_date: actualOffloadingDate || undefined,
+      })
+      setDatesSaved(true)
+      onSaved()
+    } finally {
+      setIsSavingDates(false)
+    }
+  }
+
+  async function handlePodUpload() {
+    if (!recentBooking || !podFile) return
+    setPodError(null)
+    setIsUploadingPod(true)
+    try {
+      await uploadProofOfDelivery(recentBooking.id, podFile)
+      setPodFile(null)
+      onSaved()
+    } catch (err) {
+      setPodError(err instanceof Error ? err.message : 'Upload failed')
+    } finally {
+      setIsUploadingPod(false)
     }
   }
 
@@ -87,14 +124,17 @@ function TrackingDetailForm({ truck, onSaved }: TrackingDetailFormProps) {
     <div>
       <div className="bg-gray-50 rounded-lg p-4 mb-6">
         <p className="font-medium text-gray-800">
-          {truck.reg_no} — {truck.trailer?.reg_no ?? 'no trailer'} — {truck.driver?.full_name ?? 'no driver'}
+          {recentBooking?.truck_trip_code ?? truck.reg_no} — {truck.trailer?.reg_no ?? 'no trailer'} — {truck.driver?.full_name ?? 'no driver'}
         </p>
         {recentBooking ? (
           <>
-            <p className="text-sm text-gray-500 mt-1">Last booking: {recentBooking.trip_leg.trip.trip_number}</p>
+            <p className="text-sm text-gray-500 mt-1">Client: {recentBooking.trip_leg.client?.company_name ?? '—'}</p>
             <p className="text-sm text-gray-500">
-              {recentBooking.loading_point ?? '—'} → {recentBooking.offloading_point ?? '—'}
+              {recentBooking.trip_leg.loading_point ?? '—'} → {recentBooking.trip_leg.offloading_point ?? '—'}
             </p>
+            {recentBooking.is_overdue && (
+              <p className="text-sm text-red-600 font-medium mt-1">⚠ Past ETA — not yet completed</p>
+            )}
           </>
         ) : (
           <p className="text-sm text-gray-400 mt-1">No bookings yet for this truck.</p>
@@ -105,35 +145,63 @@ function TrackingDetailForm({ truck, onSaved }: TrackingDetailFormProps) {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
         <div>
           <label className="block text-xs text-gray-500 mb-1">Current Location</label>
-          <input
-            type="text"
-            value={location}
-            onChange={(e) => setLocation(e.target.value)}
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"
-          />
+          <input type="text" value={location} onChange={(e) => setLocation(e.target.value)}
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" />
         </div>
         <div>
           <label className="block text-xs text-gray-500 mb-1">Current Status</label>
-          <select
-            value={status}
-            onChange={(e) => setStatus(e.target.value as TrackingStatus)}
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"
-          >
-            {TRACKING_STATUS_OPTIONS.map((opt) => (
-              <option key={opt.value} value={opt.value}>{opt.label}</option>
-            ))}
+          <select value={status} onChange={(e) => setStatus(e.target.value as TrackingStatus)}
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm">
+            {TRACKING_STATUS_OPTIONS.map((opt) => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
           </select>
         </div>
       </div>
-      <button
-        type="button"
-        onClick={handleStatusSave}
-        disabled={isSavingStatus}
-        className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors disabled:opacity-50 mb-6"
-      >
+      <button type="button" onClick={handleStatusSave} disabled={isSavingStatus}
+        className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors disabled:opacity-50 mb-6">
         {isSavingStatus ? <Loader2 size={14} className="animate-spin" /> : statusSaved ? <Check size={14} /> : null}
         {isSavingStatus ? 'Saving...' : statusSaved ? 'Saved' : 'Update Status'}
       </button>
+
+      {recentBooking && (
+        <>
+          <h3 className="text-sm font-bold text-gray-600 mb-3">Actual Loading / Offloading Dates</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
+            <div>
+              <label className="block text-xs text-gray-500 mb-1">Actual Loading Date</label>
+              <input type="date" value={actualLoadingDate} onChange={(e) => setActualLoadingDate(e.target.value)}
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" />
+            </div>
+            <div>
+              <label className="block text-xs text-gray-500 mb-1">Actual Offloading Date</label>
+              <input type="date" value={actualOffloadingDate} onChange={(e) => setActualOffloadingDate(e.target.value)}
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" />
+            </div>
+          </div>
+          <button type="button" onClick={handleDatesSave} disabled={isSavingDates}
+            className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors disabled:opacity-50 mb-6">
+            {isSavingDates ? <Loader2 size={14} className="animate-spin" /> : datesSaved ? <Check size={14} /> : null}
+            {isSavingDates ? 'Saving...' : datesSaved ? 'Saved' : 'Save Dates'}
+          </button>
+
+          <h3 className="text-sm font-bold text-gray-600 mb-3">Proof of Delivery</h3>
+          {recentBooking.documents.length > 0 && (
+            <div className="flex items-center gap-2 text-sm text-green-700 bg-green-50 rounded-lg px-3 py-2 mb-3">
+              <FileCheck size={16} />
+              {recentBooking.documents.length} file(s) already uploaded
+            </div>
+          )}
+          {podError && <p className="text-sm text-red-600 mb-2">{podError}</p>}
+          <div className="flex gap-2 mb-6">
+            <input type="file" onChange={(e) => setPodFile(e.target.files?.[0] ?? null)}
+              className="flex-1 text-sm border border-gray-300 rounded-lg px-3 py-2" />
+            <button type="button" onClick={handlePodUpload} disabled={!podFile || isUploadingPod}
+              className="flex items-center gap-1.5 bg-gray-800 text-white px-3 py-2 rounded-lg text-sm font-medium hover:bg-gray-900 transition-colors disabled:opacity-50">
+              {isUploadingPod ? <Loader2 size={14} className="animate-spin" /> : <Upload size={14} />}
+              Upload
+            </button>
+          </div>
+        </>
+      )}
 
       <h3 className="text-sm font-bold text-gray-600 mb-3">Checkpoint Milestones</h3>
       <div className="space-y-3">
@@ -143,33 +211,19 @@ function TrackingDetailForm({ truck, onSaved }: TrackingDetailFormProps) {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3 items-end">
               <div>
                 <label className="block text-xs text-gray-500 mb-1">Arrival</label>
-                <input
-                  type="datetime-local"
-                  value={milestones[cp.id]?.arrivalAt ?? ''}
+                <input type="datetime-local" value={milestones[cp.id]?.arrivalAt ?? ''}
                   onChange={(e) => updateMilestoneField(cp.id, 'arrivalAt', e.target.value)}
-                  className="w-full border border-gray-300 rounded-lg px-2 py-1.5 text-sm"
-                />
+                  className="w-full border border-gray-300 rounded-lg px-2 py-1.5 text-sm" />
               </div>
               <div>
                 <label className="block text-xs text-gray-500 mb-1">Dispatch</label>
-                <input
-                  type="datetime-local"
-                  value={milestones[cp.id]?.dispatchAt ?? ''}
+                <input type="datetime-local" value={milestones[cp.id]?.dispatchAt ?? ''}
                   onChange={(e) => updateMilestoneField(cp.id, 'dispatchAt', e.target.value)}
-                  className="w-full border border-gray-300 rounded-lg px-2 py-1.5 text-sm"
-                />
+                  className="w-full border border-gray-300 rounded-lg px-2 py-1.5 text-sm" />
               </div>
-              <button
-                type="button"
-                onClick={() => handleMilestoneSave(cp.id)}
-                disabled={savingCheckpointId === cp.id}
-                className="flex items-center justify-center gap-1.5 bg-gray-800 text-white px-3 py-1.5 rounded-lg text-sm font-medium hover:bg-gray-900 transition-colors disabled:opacity-50"
-              >
-                {savingCheckpointId === cp.id ? (
-                  <Loader2 size={14} className="animate-spin" />
-                ) : savedCheckpointId === cp.id ? (
-                  <Check size={14} />
-                ) : null}
+              <button type="button" onClick={() => handleMilestoneSave(cp.id)} disabled={savingCheckpointId === cp.id}
+                className="flex items-center justify-center gap-1.5 bg-gray-800 text-white px-3 py-1.5 rounded-lg text-sm font-medium hover:bg-gray-900 transition-colors disabled:opacity-50">
+                {savingCheckpointId === cp.id ? <Loader2 size={14} className="animate-spin" /> : savedCheckpointId === cp.id ? <Check size={14} /> : null}
                 {savingCheckpointId === cp.id ? 'Saving...' : savedCheckpointId === cp.id ? 'Saved' : 'Save'}
               </button>
             </div>

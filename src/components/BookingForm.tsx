@@ -30,10 +30,6 @@ interface SelectedTruck {
   driverId: string
   capacityOverride: string
   cargo: string
-  loadingPoint: string
-  loadingPointArrivalDate: string
-  offloadingPoint: string
-  offloadingDate: string
   invoicedTransitWeight: string
   invoicedDetentionCharge: string
   rate: string
@@ -68,10 +64,6 @@ function BookingForm({ trip, onSaved }: BookingFormProps) {
       driverId: bt.driver?.id.toString() ?? '',
       capacityOverride: bt.capacity_override ?? '',
       cargo: bt.cargo ?? '',
-      loadingPoint: bt.loading_point ?? '',
-      loadingPointArrivalDate: bt.loading_point_arrival_date ?? '',
-      offloadingPoint: bt.offloading_point ?? '',
-      offloadingDate: bt.offloading_date ?? '',
       invoicedTransitWeight: bt.invoiced_transit_weight ?? '',
       invoicedDetentionCharge: bt.invoiced_detention_charge ?? '',
       rate: bt.rate ?? '',
@@ -84,6 +76,8 @@ function BookingForm({ trip, onSaved }: BookingFormProps) {
   const [location, setLocation] = useState(goLeg?.location ?? '')
   const [itemSn, setItemSn] = useState(goLeg?.item_sn ?? '')
   const [description, setDescription] = useState(goLeg?.description ?? '')
+  const [loadingPoint, setLoadingPoint] = useState(goLeg?.loading_point ?? '')
+  const [offloadingPoint, setOffloadingPoint] = useState(goLeg?.offloading_point ?? '')
 
   const [tripNumberInput, setTripNumberInput] = useState('')
   const [foundTrip, setFoundTrip] = useState<Trip | null>(null)
@@ -107,10 +101,6 @@ function BookingForm({ trip, onSaved }: BookingFormProps) {
         driverId: truck?.driver?.id.toString() ?? '',
         capacityOverride: '',
         cargo: '',
-        loadingPoint: '',
-        loadingPointArrivalDate: '',
-        offloadingPoint: '',
-        offloadingDate: '',
         invoicedTransitWeight: '',
         invoicedDetentionCharge: '',
         rate: '',
@@ -131,6 +121,8 @@ function BookingForm({ trip, onSaved }: BookingFormProps) {
     setLocation('')
     setItemSn('')
     setDescription('')
+    setLoadingPoint('')
+    setOffloadingPoint('')
     setSelectedTrucks([])
     setFoundTrip(null)
     setTripNumberInput('')
@@ -167,10 +159,6 @@ function BookingForm({ trip, onSaved }: BookingFormProps) {
       driver_id: s.driverId || undefined,
       capacity_override: s.capacityOverride || undefined,
       cargo: s.cargo || undefined,
-      loading_point: s.loadingPoint || undefined,
-      loading_point_arrival_date: s.loadingPointArrivalDate || undefined,
-      offloading_point: s.offloadingPoint || undefined,
-      offloading_date: s.offloadingDate || undefined,
       invoiced_transit_weight: s.invoicedTransitWeight || undefined,
       invoiced_detention_charge: s.invoicedDetentionCharge || undefined,
       rate: s.rate || undefined,
@@ -184,6 +172,8 @@ function BookingForm({ trip, onSaved }: BookingFormProps) {
       location: location || undefined,
       item_sn: itemSn || undefined,
       description: description || undefined,
+      loading_point: loadingPoint || undefined,
+      offloading_point: offloadingPoint || undefined,
     }
 
     try {
@@ -247,7 +237,7 @@ function BookingForm({ trip, onSaved }: BookingFormProps) {
               type="text"
               value={tripNumberInput}
               onChange={(e) => setTripNumberInput(e.target.value)}
-              placeholder="e.g. 1T111AAA"
+              placeholder="e.g. Trip 1"
               className="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm"
             />
             <button
@@ -353,55 +343,6 @@ function BookingForm({ trip, onSaved }: BookingFormProps) {
                         />
                       </div>
                       <div>
-                        <label className="block text-xs text-gray-500 mb-1">Loading Point</label>
-                        <input
-                          type="text"
-                          value={s.loadingPoint}
-                          onChange={(e) => updateSelectedTruck(s.truckId, 'loadingPoint', e.target.value)}
-                          className="w-full border border-gray-300 rounded-lg px-2 py-1.5 text-sm"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-xs text-gray-500 mb-1">Loading Arrival Date</label>
-                        <input
-                          type="date"
-                          value={s.loadingPointArrivalDate}
-                          onChange={(e) => updateSelectedTruck(s.truckId, 'loadingPointArrivalDate', e.target.value)}
-                          className="w-full border border-gray-300 rounded-lg px-2 py-1.5 text-sm"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-xs text-gray-500 mb-1">Offloading Point</label>
-                        <input
-                          type="text"
-                          value={s.offloadingPoint}
-                          onChange={(e) => updateSelectedTruck(s.truckId, 'offloadingPoint', e.target.value)}
-                          className="w-full border border-gray-300 rounded-lg px-2 py-1.5 text-sm"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-xs text-gray-500 mb-1">Offloading Date</label>
-                        <input
-                          type="date"
-                          value={s.offloadingDate}
-                          onChange={(e) => updateSelectedTruck(s.truckId, 'offloadingDate', e.target.value)}
-                          className="w-full border border-gray-300 rounded-lg px-2 py-1.5 text-sm"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-xs text-gray-500 mb-1">Invoiced Transit Weight</label>
-                        <input
-                          type="number"
-                          step="0.01"
-                          value={s.invoicedTransitWeight}
-                          onChange={(e) => updateSelectedTruck(s.truckId, 'invoicedTransitWeight', e.target.value)}
-                          className="w-full border border-gray-300 rounded-lg px-2 py-1.5 text-sm"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mt-3">
-                      <div>
                         <label className="block text-xs text-gray-500 mb-1">Rate ($/ton)</label>
                         <input
                           type="number"
@@ -418,6 +359,16 @@ function BookingForm({ trip, onSaved }: BookingFormProps) {
                           step="0.01"
                           value={s.quantity}
                           onChange={(e) => updateSelectedTruck(s.truckId, 'quantity', e.target.value)}
+                          className="w-full border border-gray-300 rounded-lg px-2 py-1.5 text-sm"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs text-gray-500 mb-1">Invoiced Transit Weight</label>
+                        <input
+                          type="number"
+                          step="0.01"
+                          value={s.invoicedTransitWeight}
+                          onChange={(e) => updateSelectedTruck(s.truckId, 'invoicedTransitWeight', e.target.value)}
                           className="w-full border border-gray-300 rounded-lg px-2 py-1.5 text-sm"
                         />
                       </div>
@@ -466,6 +417,26 @@ function BookingForm({ trip, onSaved }: BookingFormProps) {
             type="date"
             value={eta}
             onChange={(e) => setEta(e.target.value)}
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Loading Point</label>
+          <input
+            type="text"
+            value={loadingPoint}
+            onChange={(e) => setLoadingPoint(e.target.value)}
+            placeholder="Shared for all trucks in this booking"
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Offloading Point</label>
+          <input
+            type="text"
+            value={offloadingPoint}
+            onChange={(e) => setOffloadingPoint(e.target.value)}
+            placeholder="Shared for all trucks in this booking"
             className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"
           />
         </div>

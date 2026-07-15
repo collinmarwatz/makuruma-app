@@ -2,7 +2,6 @@ import type { ExpenseOrder } from '../types/expense'
 import Badge from './ui/Badge'
 import { Pencil, Trash2, Check, X, DollarSign, Download } from 'lucide-react'
 
-
 interface ExpenseTableProps {
   expenses: ExpenseOrder[]
   userRoleSlug: string | null
@@ -12,7 +11,6 @@ interface ExpenseTableProps {
   onReject: (expense: ExpenseOrder) => void
   onMarkPaid: (expense: ExpenseOrder) => void
   onDownload: (expense: ExpenseOrder) => void
-
 }
 
 const statusColors: Record<string, 'green' | 'yellow' | 'red' | 'gray'> = {
@@ -35,7 +33,9 @@ function ExpenseTable({ expenses, userRoleSlug, onEdit, onDelete, onApprove, onR
             <th className="px-4 py-3">Category</th>
             <th className="px-4 py-3">Reference</th>
             <th className="px-4 py-3">Created By</th>
-            <th className="px-4 py-3">Total</th>
+            <th className="px-4 py-3">Initiated By</th>
+            <th className="px-4 py-3">Payment Date</th>
+            <th className="px-4 py-3">Total (TZS)</th>
             <th className="px-4 py-3">Status</th>
             <th className="px-4 py-3">Approved By</th>
             <th className="px-4 py-3">Paid By</th>
@@ -51,75 +51,70 @@ function ExpenseTable({ expenses, userRoleSlug, onEdit, onDelete, onApprove, onR
                 {exp.trip?.trip_number ?? exp.truck?.reg_no ?? '—'}
               </td>
               <td className="px-4 py-3 text-gray-600">{exp.creator.name}</td>
+              <td className="px-4 py-3 text-gray-600">{exp.initiated_by ?? '—'}</td>
+              <td className="px-4 py-3 text-gray-600">{exp.payment_date ? exp.payment_date.slice(0, 10) : '—'}</td>
               <td className="px-4 py-3 text-gray-800 font-medium">
-                ${parseFloat(exp.total_amount).toLocaleString()}
+                TZS {parseFloat(exp.total_amount).toLocaleString()}
               </td>
-              <td className="px-4 py-3 text-gray-600">
-  {exp.trip?.trip_number ?? exp.truck?.reg_no ?? '—'}
-  {exp.trucks.length > 0 && (
-    <span className="text-gray-400 text-xs ml-1">({exp.trucks.length} trucks)</span>
-  )}
-</td>
               <td className="px-4 py-3">
                 <Badge label={exp.status} color={statusColors[exp.status]} />
               </td>
               <td className="px-4 py-3 text-gray-500 text-xs">{exp.approver?.name ?? '—'}</td>
               <td className="px-4 py-3 text-gray-500 text-xs">{exp.payer?.name ?? '—'}</td>
               <td className="px-4 py-3">
-  <div className="flex justify-end gap-1.5">
-    <button
-      onClick={() => onDownload(exp)}
-      className="p-1.5 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors"
-      title="Download expense order"
-    >
-      <Download size={16} />
-    </button>
-
-    {exp.status === 'pending' && canApprove && (
-      <>
-        <button
-          onClick={() => onApprove(exp)}
-          className="p-1.5 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors"
-          title="Approve"
-        >
-          <Check size={16} />
-        </button>
-        <button
-          onClick={() => onReject(exp)}
-          className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-          title="Reject"
-        >
-          <X size={16} />
-        </button>
-      </>
-    )}
-    {exp.status === 'approved' && canPay && (
-      <button
-        onClick={() => onMarkPaid(exp)}
-        className="p-1.5 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors"
-        title="Mark as Paid"
-      >
-        <DollarSign size={16} />
-      </button>
-    )}
-    {exp.status === 'pending' && (
-  <button
-    onClick={() => onEdit(exp)}
-    className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-    title="Edit"
-  >
-    <Pencil size={16} />
-  </button>
-)}
-<button
-  onClick={() => onDelete(exp)}
-  className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-  title="Delete"
->
-  <Trash2 size={16} />
-</button>
-  </div>
-</td>
+                <div className="flex justify-end gap-1.5">
+                  <button
+                    onClick={() => onDownload(exp)}
+                    className="p-1.5 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors"
+                    title="Download expense order"
+                  >
+                    <Download size={16} />
+                  </button>
+                  {exp.status === 'pending' && canApprove && (
+                    <>
+                      <button
+                        onClick={() => onApprove(exp)}
+                        className="p-1.5 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors"
+                        title="Approve"
+                      >
+                        <Check size={16} />
+                      </button>
+                      <button
+                        onClick={() => onReject(exp)}
+                        className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                        title="Reject"
+                      >
+                        <X size={16} />
+                      </button>
+                    </>
+                  )}
+                  {exp.status === 'approved' && canPay && (
+                    <button
+                      onClick={() => onMarkPaid(exp)}
+                      className="p-1.5 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors"
+                      title="Mark as Paid"
+                    >
+                      <DollarSign size={16} />
+                    </button>
+                  )}
+                  {exp.status === 'pending' && (
+                    <button
+                      onClick={() => onEdit(exp)}
+                      className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                      title="Edit"
+                    >
+                      <Pencil size={16} />
+                    </button>
+                  )}
+                  <button
+                    onClick={() => onDelete(exp)}
+                    className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                    title="Delete"
+                  >
+                    <Trash2 size={16} />
+                  </button>
+                </div>
+              </td>
             </tr>
           ))}
         </tbody>

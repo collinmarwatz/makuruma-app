@@ -31,6 +31,35 @@ export async function upsertMilestone(
   })
 }
 
+export async function updateTripDates(
+  bookingTruckId: number,
+  data: { actual_loading_date?: string; actual_offloading_date?: string }
+) {
+  return apiClient(`/booking-trucks/${bookingTruckId}/dates`, {
+    method: 'PUT',
+    body: JSON.stringify(data),
+  })
+}
+
+export async function uploadProofOfDelivery(bookingTruckId: number, file: File) {
+  const token = localStorage.getItem('auth_token')
+  const formData = new FormData()
+  formData.append('document_type', 'POD')
+  formData.append('attachment', file)
+
+  const response = await fetch(`${API_BASE_URL}/booking-trucks/${bookingTruckId}/documents`, {
+    method: 'POST',
+    headers: {
+      Accept: 'application/json',
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+    body: formData,
+  })
+
+  if (!response.ok) throw new Error('Failed to upload proof of delivery')
+  return response.json()
+}
+
 export async function downloadTrackingReport(truck: TrackedTruck): Promise<void> {
   const token = localStorage.getItem('auth_token')
 

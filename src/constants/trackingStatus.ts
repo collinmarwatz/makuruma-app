@@ -6,6 +6,7 @@ export const TRACKING_STATUS_OPTIONS: { value: TrackingStatus; label: string }[]
   { value: 'at_border', label: 'At Border' },
   { value: 'offloading', label: 'Offloading' },
   { value: 'delayed', label: 'Delayed' },
+  { value: 'breakdown', label: 'Breakdown' },
   { value: 'completed', label: 'Completed' },
 ]
 
@@ -15,5 +16,6 @@ export const TRACKING_STATUS_COLORS: Record<TrackingStatus, 'green' | 'yellow' |
   at_border: 'yellow',
   offloading: 'yellow',
   delayed: 'red',
+  breakdown: 'red',
   completed: 'green',
 }

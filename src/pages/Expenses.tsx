@@ -24,6 +24,8 @@ function Expenses() {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [editingExpense, setEditingExpense] = useState<ExpenseOrder | null>(null)
   const [categoryFilter, setCategoryFilter] = useState<ExpenseCategory | 'all'>('all')
+  const [dateFrom, setDateFrom] = useState('')
+  const [dateTo, setDateTo] = useState('')
 
   useEffect(() => {
     let cancelled = false
@@ -34,7 +36,10 @@ function Expenses() {
         setError(null)
       }
       try {
-        const data = await fetchExpenseOrders()
+        const data = await fetchExpenseOrders({
+          date_from: dateFrom || undefined,
+          date_to: dateTo || undefined,
+        })
         if (!cancelled) setExpenses(data)
       } catch (err) {
         if (!cancelled) setError(err instanceof Error ? err.message : 'Failed to load expenses')
@@ -47,7 +52,7 @@ function Expenses() {
     return () => {
       cancelled = true
     }
-  }, [reloadTrigger])
+  }, [reloadTrigger, dateFrom, dateTo])
 
   const filteredExpenses = useMemo(() => {
     if (categoryFilter === 'all') return expenses
@@ -83,18 +88,18 @@ function Expenses() {
   }
 
   async function handleDelete(expense: ExpenseOrder) {
-  const warning = expense.status !== 'pending'
-    ? `${expense.order_number} has already been ${expense.status}. This will permanently delete it. Continue?`
-    : `Delete expense order ${expense.order_number}?`
+    const warning = expense.status !== 'pending'
+      ? `${expense.order_number} has already been ${expense.status}. This will permanently delete it. Continue?`
+      : `Delete expense order ${expense.order_number}?`
 
-  if (!window.confirm(warning)) return
-  try {
-    await deleteExpenseOrder(expense.id)
-    refresh()
-  } catch (err) {
-    alert(err instanceof Error ? err.message : 'Failed to delete expense')
+    if (!window.confirm(warning)) return
+    try {
+      await deleteExpenseOrder(expense.id)
+      refresh()
+    } catch (err) {
+      alert(err instanceof Error ? err.message : 'Failed to delete expense')
+    }
   }
-}
 
   async function handleApprove(expense: ExpenseOrder) {
     try {
@@ -154,22 +159,38 @@ function Expenses() {
         </button>
       </div>
 
-      <div className="flex gap-2 mb-6 bg-gray-100 rounded-lg p-1 w-fit">
-        {categoryTabs.map((tab) => (
-          <button
-            key={tab.value}
-            onClick={() => setCategoryFilter(tab.value)}
-            className={`px-4 py-1.5 rounded-md text-sm font-medium transition-colors ${
-              categoryFilter === tab.value ? 'bg-white shadow-sm text-blue-700' : 'text-gray-500'
-            }`}
-          >
-            {tab.label} ({categoryCounts[tab.value]})
-          </button>
-        ))}
+      <div className="flex flex-col md:flex-row md:items-center gap-3 mb-6">
+        <div className="flex gap-2 bg-gray-100 rounded-lg p-1 w-fit">
+          {categoryTabs.map((tab) => (
+            <button
+              key={tab.value}
+              onClick={() => setCategoryFilter(tab.value)}
+              className={`px-4 py-1.5 rounded-md text-sm font-medium transition-colors ${
+                categoryFilter === tab.value ? 'bg-white shadow-sm text-blue-700' : 'text-gray-500'
+              }`}
+            >
+              {tab.label} ({categoryCounts[tab.value]})
+            </button>
+          ))}
+        </div>
+
+        <div className="flex items-center gap-2">
+          <label className="text-xs text-gray-500">From</label>
+          <input type="date" value={dateFrom} onChange={(e) => setDateFrom(e.target.value)}
+            className="border border-gray-300 rounded-lg px-2 py-1.5 text-sm" />
+          <label className="text-xs text-gray-500">To</label>
+          <input type="date" value={dateTo} onChange={(e) => setDateTo(e.target.value)}
+            className="border border-gray-300 rounded-lg px-2 py-1.5 text-sm" />
+          {(dateFrom || dateTo) && (
+            <button onClick={() => { setDateFrom(''); setDateTo('') }} className="text-xs text-gray-400 hover:text-gray-600 underline">
+              Clear
+            </button>
+          )}
+        </div>
       </div>
 
       {loading ? (
-        <TableSkeleton columns={9} />
+        <TableSkeleton columns={11} />
       ) : (
         <ExpenseTable
           expenses={filteredExpenses}

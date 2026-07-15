@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from 'react'
 import type { TrackedTruck, TrackingStatus } from '../types/tracking'
 import { fetchTrackedTrucks, downloadTrackingReport } from '../services/trackingService'
+import { fetchClients } from '../services/clientService'
+import type { Client } from '../types/partner'
 import { exportTrackingCsv } from '../utils/csvExports'
 import { TRACKING_STATUS_OPTIONS } from '../constants/trackingStatus'
 import TrackingTable from '../components/TrackingTable'
@@ -18,7 +20,13 @@ function Tracking() {
 
   const [searchTerm, setSearchTerm] = useState('')
   const [statusFilter, setStatusFilter] = useState<TrackingStatus | 'all'>('all')
+  const [clientFilter, setClientFilter] = useState('')
+  const [clients, setClients] = useState<Client[]>([])
   const [isExporting, setIsExporting] = useState(false)
+
+  useEffect(() => {
+    fetchClients().then(setClients).catch(() => setClients([]))
+  }, [])
 
   useEffect(() => {
     let cancelled = false
@@ -54,17 +62,19 @@ function Tracking() {
   const filteredTrucks = useMemo(() => {
     return trucks.filter((truck) => {
       const matchesStatus = statusFilter === 'all' || truck.current_status === statusFilter
-      const search = searchTerm.trim().toLowerCase()
       const recentBooking = truck.booking_trucks?.[0]
+      const matchesClient = !clientFilter || recentBooking?.trip_leg.client?.id.toString() === clientFilter
+      const search = searchTerm.trim().toLowerCase()
       const matchesSearch =
         !search ||
         truck.reg_no.toLowerCase().includes(search) ||
         (truck.driver?.full_name.toLowerCase().includes(search) ?? false) ||
-        (recentBooking?.trip_leg.trip.trip_number.toLowerCase().includes(search) ?? false)
+        (recentBooking?.trip_leg.trip.trip_number.toLowerCase().includes(search) ?? false) ||
+        (recentBooking?.truck_trip_code.toLowerCase().includes(search) ?? false)
 
-      return matchesStatus && matchesSearch
+      return matchesStatus && matchesClient && matchesSearch
     })
-  }, [trucks, searchTerm, statusFilter])
+  }, [trucks, searchTerm, statusFilter, clientFilter])
 
   function refresh() {
     setReloadTrigger((prev) => prev + 1)
@@ -115,6 +125,14 @@ function Tracking() {
             className="w-full border border-gray-300 rounded-lg pl-9 pr-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           />
         </div>
+        <select
+          value={clientFilter}
+          onChange={(e) => setClientFilter(e.target.value)}
+          className="border border-gray-300 rounded-lg px-3 py-2 text-sm"
+        >
+          <option value="">All Clients</option>
+          {clients.map((c) => <option key={c.id} value={c.id}>{c.company_name}</option>)}
+        </select>
         <select
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value as TrackingStatus | 'all')}
