@@ -10,6 +10,12 @@ interface TruckTableProps {
   onDelete: (truck: Truck) => void
 }
 
+const statusColors: Record<Truck['status'], 'green' | 'yellow' | 'red' | 'gray'> = {
+  active: 'green',
+  maintenance: 'yellow',
+  decommissioned: 'red',
+}
+
 const expiryColors: Record<string, 'green' | 'yellow' | 'red' | 'gray'> = {
   valid: 'green',
   'expiring-soon': 'yellow',
@@ -25,6 +31,7 @@ function TruckTable({ trucks, onEdit, onDelete }: TruckTableProps) {
           <tr>
             <th className="px-4 py-3">Reg No</th>
             <th className="px-4 py-3">Capacity</th>
+            <th className="px-4 py-3">Status</th>
             <th className="px-4 py-3">Trailer</th>
             <th className="px-4 py-3">Driver</th>
             {TRUCK_COMPLIANCE_TYPES.map(({ key, label }) => (
@@ -38,6 +45,9 @@ function TruckTable({ trucks, onEdit, onDelete }: TruckTableProps) {
             <tr key={truck.id} className="hover:bg-gray-50 transition-colors">
               <td className="px-4 py-3 font-medium text-gray-800">{truck.reg_no}</td>
               <td className="px-4 py-3 text-gray-600">{truck.capacity} tons</td>
+              <td className="px-4 py-3">
+                <Badge label={truck.status} color={statusColors[truck.status]} />
+              </td>
               <td className="px-4 py-3 text-gray-600">{truck.trailer?.reg_no ?? '—'}</td>
               <td className="px-4 py-3 text-gray-600">{truck.driver?.full_name ?? '—'}</td>
               {TRUCK_COMPLIANCE_TYPES.map(({ key }) => {

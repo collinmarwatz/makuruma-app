@@ -52,14 +52,15 @@ function Tracking() {
   }, [reloadTrigger])
 
   const filteredTrucks = useMemo(() => {
-    return trucks.filter((bt) => {
-      const matchesStatus = statusFilter === 'all' || bt.current_status === statusFilter
+    return trucks.filter((truck) => {
+      const matchesStatus = statusFilter === 'all' || truck.current_status === statusFilter
       const search = searchTerm.trim().toLowerCase()
+      const recentBooking = truck.booking_trucks?.[0]
       const matchesSearch =
         !search ||
-        bt.truck.reg_no.toLowerCase().includes(search) ||
-        bt.driver?.full_name.toLowerCase().includes(search) ||
-        bt.trip_leg.trip.trip_number.toLowerCase().includes(search)
+        truck.reg_no.toLowerCase().includes(search) ||
+        (truck.driver?.full_name.toLowerCase().includes(search) ?? false) ||
+        (recentBooking?.trip_leg.trip.trip_number.toLowerCase().includes(search) ?? false)
 
       return matchesStatus && matchesSearch
     })
@@ -101,7 +102,7 @@ function Tracking() {
           Export {filteredTrucks.length > 0 ? `(${filteredTrucks.length})` : ''}
         </button>
       </div>
-      <p className="text-sm text-gray-400 mb-4">Live status and checkpoint milestones for trucks currently on the road.</p>
+      <p className="text-sm text-gray-400 mb-4">Live status and checkpoint milestones for every truck in your fleet.</p>
 
       <div className="flex flex-col md:flex-row gap-3 mb-6">
         <div className="relative flex-1">
@@ -127,7 +128,7 @@ function Tracking() {
       </div>
 
       {loading ? (
-        <TableSkeleton columns={10} />
+        <TableSkeleton columns={9} />
       ) : (
         <TrackingTable trucks={filteredTrucks} onView={setSelectedTruck} onDownload={handleDownloadReport} />
       )}
@@ -135,7 +136,7 @@ function Tracking() {
       <Modal
         isOpen={!!selectedTruck}
         onClose={() => setSelectedTruck(null)}
-        title={selectedTruck ? `Tracking — ${selectedTruck.truck.reg_no}` : ''}
+        title={selectedTruck ? `Tracking — ${selectedTruck.reg_no}` : ''}
       >
         {selectedTruck && <TrackingDetailForm truck={selectedTruck} onSaved={refresh} />}
       </Modal>

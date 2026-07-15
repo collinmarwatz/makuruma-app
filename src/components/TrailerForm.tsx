@@ -51,11 +51,11 @@ function TrailerForm({ trailer, onSaved }: TrailerFormProps) {
         const { dueDate, attachment } = compliance[key]
         if (!dueDate) continue
 
-        await createDocument('trailers', savedTrailer.id, {
-          document_type: key,
-          expiry_date: dueDate,
-          attachment,
-        })
+            await createDocument('trailers', savedTrailer.id, {
+            document_type: key,
+            expiry_date: dueDate,
+            attachment,
+            })
       }
 
       onSaved()

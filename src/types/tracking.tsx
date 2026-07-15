@@ -17,20 +17,19 @@ export interface TruckMilestone {
 
 export type TrackingStatus = 'loading' | 'in_transit' | 'at_border' | 'offloading' | 'delayed' | 'completed'
 
-export interface TrackedTruck {
-  id: number
-  truck: Truck
-  trailer: Trailer | null
-  driver: Driver | null
+export interface RecentBooking {
   loading_point: string | null
-  loading_point_arrival_date: string | null
   offloading_point: string | null
-  offloading_date: string | null
-  current_location: string | null
-  current_status: TrackingStatus
   trip_leg: {
-    direction: 'go' | 'return'
     trip: { trip_number: string }
   }
+}
+
+export interface TrackedTruck extends Truck {
+  trailer: Trailer | null
+  driver: Driver | null
+  current_location: string | null
+  current_status: TrackingStatus
   milestones: TruckMilestone[]
+  booking_trucks: RecentBooking[]
 }

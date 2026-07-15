@@ -10,25 +10,22 @@ function escapeCsvCell(value: string): string {
 
 export function exportTrackingCsv(trucks: TrackedTruck[]) {
   const headers = [
-    'Booking Number', 'Direction', 'Truck', 'Trailer', 'Driver',
+    'Booking Number', 'Truck', 'Trailer', 'Driver',
     'Loading Point', 'Offloading Point', 'Current Location', 'Current Status',
-    'Arrival Loading Point', 'Arrival Offloading Point',
   ]
 
-  const rows = trucks.map((bt) => {
-    const statusLabel = TRACKING_STATUS_OPTIONS.find((o) => o.value === bt.current_status)?.label ?? bt.current_status
+  const rows = trucks.map((truck) => {
+    const statusLabel = TRACKING_STATUS_OPTIONS.find((o) => o.value === truck.current_status)?.label ?? truck.current_status
+    const recentBooking = truck.booking_trucks?.[0]
     return [
-      bt.trip_leg.trip.trip_number,
-      bt.trip_leg.direction.toUpperCase(),
-      bt.truck.reg_no,
-      bt.trailer?.reg_no ?? '',
-      bt.driver?.full_name ?? '',
-      bt.loading_point ?? '',
-      bt.offloading_point ?? '',
-      bt.current_location ?? '',
+      recentBooking?.trip_leg.trip.trip_number ?? '',
+      truck.reg_no,
+      truck.trailer?.reg_no ?? '',
+      truck.driver?.full_name ?? '',
+      recentBooking?.loading_point ?? '',
+      recentBooking?.offloading_point ?? '',
+      truck.current_location ?? '',
       statusLabel,
-      bt.loading_point_arrival_date ?? '',
-      bt.offloading_date ?? '',
     ].map((cell) => escapeCsvCell(String(cell)))
   })
 

@@ -30,6 +30,8 @@ function TrackingDetailForm({ truck, onSaved }: TrackingDetailFormProps) {
   const [savingCheckpointId, setSavingCheckpointId] = useState<number | null>(null)
   const [savedCheckpointId, setSavedCheckpointId] = useState<number | null>(null)
 
+  const recentBooking = truck.booking_trucks?.[0] ?? null
+
   useEffect(() => {
     fetchCheckpoints().then((data) => {
       setCheckpoints(data)
@@ -84,11 +86,19 @@ function TrackingDetailForm({ truck, onSaved }: TrackingDetailFormProps) {
   return (
     <div>
       <div className="bg-gray-50 rounded-lg p-4 mb-6">
-        <p className="text-sm text-gray-500 mb-1">Booking {truck.trip_leg.trip.trip_number} · {truck.trip_leg.direction.toUpperCase()} leg</p>
-        <p className="font-medium text-gray-800">{truck.truck.reg_no} — {truck.trailer?.reg_no ?? 'no trailer'} — {truck.driver?.full_name ?? 'no driver'}</p>
-        <p className="text-sm text-gray-500 mt-1">
-          {truck.loading_point ?? '—'} → {truck.offloading_point ?? '—'}
+        <p className="font-medium text-gray-800">
+          {truck.reg_no} — {truck.trailer?.reg_no ?? 'no trailer'} — {truck.driver?.full_name ?? 'no driver'}
         </p>
+        {recentBooking ? (
+          <>
+            <p className="text-sm text-gray-500 mt-1">Last booking: {recentBooking.trip_leg.trip.trip_number}</p>
+            <p className="text-sm text-gray-500">
+              {recentBooking.loading_point ?? '—'} → {recentBooking.offloading_point ?? '—'}
+            </p>
+          </>
+        ) : (
+          <p className="text-sm text-gray-400 mt-1">No bookings yet for this truck.</p>
+        )}
       </div>
 
       <h3 className="text-sm font-bold text-gray-600 mb-3">Current Status</h3>

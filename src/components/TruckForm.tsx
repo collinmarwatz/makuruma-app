@@ -34,6 +34,7 @@ function TruckForm({ truck, onSaved }: TruckFormProps) {
 
   const [regNo, setRegNo] = useState(truck?.reg_no ?? '')
   const [capacity, setCapacity] = useState(truck?.capacity ?? '')
+  const [status, setStatus] = useState<'active' | 'maintenance' | 'decommissioned'>(truck?.status ?? 'active')
   const [trailerId, setTrailerId] = useState(truck?.trailer_id?.toString() ?? '')
   const [driverId, setDriverId] = useState(truck?.driver_id?.toString() ?? '')
   const [compliance, setCompliance] = useState<ComplianceState>(initialComplianceState())
@@ -65,6 +66,7 @@ function TruckForm({ truck, onSaved }: TruckFormProps) {
       const payload = {
         reg_no: regNo,
         capacity,
+        status,
         trailer_id: trailerId || undefined,
         driver_id: driverId || undefined,
       }
@@ -100,7 +102,7 @@ function TruckForm({ truck, onSaved }: TruckFormProps) {
         </div>
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">Reg No</label>
           <input
@@ -121,6 +123,18 @@ function TruckForm({ truck, onSaved }: TruckFormProps) {
             required
             className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
+          <select
+            value={status}
+            onChange={(e) => setStatus(e.target.value as 'active' | 'maintenance' | 'decommissioned')}
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          >
+            <option value="active">Active</option>
+            <option value="maintenance">Maintenance</option>
+            <option value="decommissioned">Decommissioned</option>
+          </select>
         </div>
       </div>
 
