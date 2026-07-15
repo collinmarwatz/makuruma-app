@@ -81,3 +81,26 @@ export async function downloadExpenseOrder(expense: ExpenseOrder): Promise<void>
   link.remove()
   window.URL.revokeObjectURL(url)
 }
+
+export async function downloadExpenseOrderExcel(expense: ExpenseOrder): Promise<void> {
+  const token = localStorage.getItem('auth_token')
+
+  const response = await fetch(`${API_BASE_URL}/expense-orders/${expense.id}/download-excel`, {
+    headers: {
+      Accept: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+  })
+
+  if (!response.ok) throw new Error('Failed to download Excel export')
+
+  const blob = await response.blob()
+  const url = window.URL.createObjectURL(blob)
+  const link = document.createElement('a')
+  link.href = url
+  link.download = `expense-${expense.order_number}.xlsx`
+  document.body.appendChild(link)
+  link.click()
+  link.remove()
+  window.URL.revokeObjectURL(url)
+}

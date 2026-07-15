@@ -7,6 +7,7 @@ import {
   rejectExpenseOrder,
   markExpensePaid,
   downloadExpenseOrder,
+  downloadExpenseOrderExcel,
 } from '../services/expenseService'
 import { useAuth } from '../hooks/useAuth'
 import ExpenseForm from '../components/ExpenseForm'
@@ -137,6 +138,14 @@ function Expenses() {
     }
   }
 
+  async function handleDownloadExcel(expense: ExpenseOrder) {
+    try {
+      await downloadExpenseOrderExcel(expense)
+    } catch (err) {
+      alert(err instanceof Error ? err.message : 'Excel download failed')
+    }
+  }
+
   if (error) return <p className="p-8 text-red-500">Error: {error}</p>
 
   const categoryTabs: { value: ExpenseCategory | 'all'; label: string }[] = [
@@ -201,6 +210,7 @@ function Expenses() {
           onReject={handleReject}
           onMarkPaid={handleMarkPaid}
           onDownload={handleDownload}
+          onDownloadExcel={handleDownloadExcel}
         />
       )}
 

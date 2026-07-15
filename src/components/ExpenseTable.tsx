@@ -1,6 +1,6 @@
 import type { ExpenseOrder } from '../types/expense'
 import Badge from './ui/Badge'
-import { Pencil, Trash2, Check, X, DollarSign, Download } from 'lucide-react'
+import { Pencil, Trash2, Check, X, DollarSign, Download, FileSpreadsheet } from 'lucide-react'
 
 interface ExpenseTableProps {
   expenses: ExpenseOrder[]
@@ -11,6 +11,7 @@ interface ExpenseTableProps {
   onReject: (expense: ExpenseOrder) => void
   onMarkPaid: (expense: ExpenseOrder) => void
   onDownload: (expense: ExpenseOrder) => void
+  onDownloadExcel: (expense: ExpenseOrder) => void
 }
 
 const statusColors: Record<string, 'green' | 'yellow' | 'red' | 'gray'> = {
@@ -20,7 +21,17 @@ const statusColors: Record<string, 'green' | 'yellow' | 'red' | 'gray'> = {
   paid: 'green',
 }
 
-function ExpenseTable({ expenses, userRoleSlug, onEdit, onDelete, onApprove, onReject, onMarkPaid, onDownload }: ExpenseTableProps) {
+function ExpenseTable({
+  expenses,
+  userRoleSlug,
+  onEdit,
+  onDelete,
+  onApprove,
+  onReject,
+  onMarkPaid,
+  onDownload,
+  onDownloadExcel,
+}: ExpenseTableProps) {
   const canApprove = userRoleSlug === 'manager' || userRoleSlug === 'admin'
   const canPay = userRoleSlug === 'accountant' || userRoleSlug === 'admin'
 
@@ -66,9 +77,16 @@ function ExpenseTable({ expenses, userRoleSlug, onEdit, onDelete, onApprove, onR
                   <button
                     onClick={() => onDownload(exp)}
                     className="p-1.5 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors"
-                    title="Download expense order"
+                    title="Download PDF"
                   >
                     <Download size={16} />
+                  </button>
+                  <button
+                    onClick={() => onDownloadExcel(exp)}
+                    className="p-1.5 text-gray-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors"
+                    title="Download Excel"
+                  >
+                    <FileSpreadsheet size={16} />
                   </button>
                   {exp.status === 'pending' && canApprove && (
                     <>
