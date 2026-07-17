@@ -11,6 +11,7 @@ export interface ExpenseLine {
   line_category: LineCategory
   vendor: { id: number; company_name: string } | null
   booking_truck: { id: number; truck: { reg_no: string } } | null
+  group_key: string | null
   description: string
   currency: Currency
   exchange_rate: string

@@ -16,6 +16,7 @@ export interface BookingTruck {
   rate: string | null
   quantity: string | null
   amount: string | null
+  exchange_rate: string | null
   actual_loading_date: string | null
   actual_offloading_date: string | null
   is_overdue: boolean

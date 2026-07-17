@@ -102,7 +102,6 @@ function Tracking() {
   return (
     <div className="min-h-screen bg-gray-50 p-8">
       <div className="flex items-center justify-between mb-1">
-        <h1 className="text-2xl font-bold text-gray-800">Tracking</h1>
         <button
           onClick={handleExportCsv}
           disabled={isExporting || filteredTrucks.length === 0}

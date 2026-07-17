@@ -1,8 +1,7 @@
 import { NavLink } from 'react-router-dom'
-import { LayoutDashboard, Truck, Users as UsersIcon, LogOut, ChevronLeft, ChevronRight } from 'lucide-react'
+import { LayoutDashboard, Users as UsersIcon, LogOut, ChevronLeft, ChevronRight } from 'lucide-react'
 import { useAuth } from '../hooks/useAuth'
 import { UserCog, IdCard } from 'lucide-react'
-import { Container } from 'lucide-react'
 import { Building2, Store } from 'lucide-react'
 import { ClipboardList } from 'lucide-react'
 import logo from '../assets/logo.png'
@@ -10,6 +9,7 @@ import { Route as RouteIcon } from 'lucide-react'
 import { MapPin } from 'lucide-react'
 import { Receipt } from 'lucide-react'
 import { FileText } from 'lucide-react'
+import { Package } from 'lucide-react'
 
 
 
@@ -19,8 +19,7 @@ const navItems = [
   { to: '/bookings', label: 'Bookings', icon: ClipboardList },
   { to: '/trips', label: 'Trips', icon: RouteIcon },
   { to: '/tracking', label: 'Tracking', icon: MapPin },
-  { to: '/trucks', label: 'Trucks', icon: Truck },
-  { to: '/trailers', label: 'Trailers', icon: Container },
+  { to: '/assets', label: 'Assets', icon: Package },
   { to: '/staff', label: 'Staff', icon: UserCog },
   { to: '/drivers', label: 'Drivers', icon: IdCard },
   { to: '/clients', label: 'Clients', icon: Building2 },

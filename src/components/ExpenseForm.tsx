@@ -56,18 +56,36 @@ function ExpenseForm({ expense, onSaved }: ExpenseFormProps) {
   const [initiatedBy, setInitiatedBy] = useState(expense?.initiated_by ?? '')
   const [paymentDate, setPaymentDate] = useState(expense?.payment_date?.slice(0, 10) ?? '')
 
-  const [rows, setRows] = useState<LineRow[]>(() =>
-    expense?.lines.map((l) => ({
-      key: Math.random().toString(36).slice(2),
-      lineCategory: l.line_category,
-      vendorId: l.vendor?.id.toString() ?? '',
-      bookingTruckSelection: l.booking_truck?.id.toString() ?? '',
-      description: l.description,
-      currency: l.currency,
-      exchangeRate: l.exchange_rate,
-      originalAmount: l.original_amount,
-    })) ?? [newRow('fuel')]
-  )
+  const [rows, setRows] = useState<LineRow[]>(() => {
+    if (!expense) return [newRow('fuel')]
+
+    // Group lines that share a group_key (i.e. came from one original
+    // "All Trucks" entry) back into a single editable row.
+    const groups = new Map<string, typeof expense.lines>()
+    let ungroupedIndex = 0
+
+    expense.lines.forEach((line) => {
+      const key = line.group_key ?? `__single_${ungroupedIndex++}`
+      if (!groups.has(key)) groups.set(key, [])
+      groups.get(key)!.push(line)
+    })
+
+    return Array.from(groups.values()).map((group) => {
+      const first = group[0]
+      const isAllTrucksGroup = group.length > 1
+
+      return {
+        key: Math.random().toString(36).slice(2),
+        lineCategory: first.line_category,
+        vendorId: first.vendor?.id.toString() ?? '',
+        bookingTruckSelection: isAllTrucksGroup ? ALL_TRUCKS : (first.booking_truck?.id.toString() ?? ''),
+        description: first.description,
+        currency: first.currency,
+        exchangeRate: first.exchange_rate,
+        originalAmount: first.original_amount,
+      }
+    })
+  })
 
   const [trips, setTrips] = useState<Trip[]>([])
   const [trucks, setTrucks] = useState<Truck[]>([])
@@ -105,12 +123,12 @@ function ExpenseForm({ expense, onSaved }: ExpenseFormProps) {
   }
 
   const total = rows.reduce((sum, r) => {
-  const rowAmount = computeTzs(r)
-  const multiplier = category === 'trip' && r.bookingTruckSelection === ALL_TRUCKS
-    ? Math.max(tripTrucks.length, 1)
-    : 1
-  return sum + rowAmount * multiplier
-}, 0)
+    const rowAmount = computeTzs(r)
+    const multiplier = category === 'trip' && r.bookingTruckSelection === ALL_TRUCKS
+      ? Math.max(tripTrucks.length, 1)
+      : 1
+    return sum + rowAmount * multiplier
+  }, 0)
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
@@ -133,24 +151,24 @@ function ExpenseForm({ expense, onSaved }: ExpenseFormProps) {
     setIsSubmitting(true)
 
     const lines: ExpenseLineInput[] = validRows.flatMap((r) => {
-  const groupKey = crypto.randomUUID()
+      const groupKey = crypto.randomUUID()
 
-  const base = {
-    line_category: r.lineCategory,
-    vendor_id: r.vendorId || undefined,
-    description: r.description,
-    currency: r.currency,
-    exchange_rate: r.currency === 'TZS' ? '1' : r.exchangeRate,
-    original_amount: r.originalAmount,
-    group_key: groupKey,
-  }
+      const base = {
+        line_category: r.lineCategory,
+        vendor_id: r.vendorId || undefined,
+        description: r.description,
+        currency: r.currency,
+        exchange_rate: r.currency === 'TZS' ? '1' : r.exchangeRate,
+        original_amount: r.originalAmount,
+        group_key: groupKey,
+      }
 
-  if (category === 'trip' && r.bookingTruckSelection === ALL_TRUCKS) {
-    return tripTrucks.map((bt) => ({ ...base, booking_truck_id: bt.id.toString() }))
-  }
+      if (category === 'trip' && r.bookingTruckSelection === ALL_TRUCKS) {
+        return tripTrucks.map((bt) => ({ ...base, booking_truck_id: bt.id.toString() }))
+      }
 
-  return [{ ...base, booking_truck_id: r.bookingTruckSelection || undefined }]
-})
+      return [{ ...base, booking_truck_id: r.bookingTruckSelection || undefined }]
+    })
 
     try {
       if (isEditMode && expense) {
@@ -337,14 +355,14 @@ function ExpenseForm({ expense, onSaved }: ExpenseFormProps) {
       })}
 
       <div className="bg-gray-50 rounded-lg p-3 mb-6 flex justify-between items-center">
-  <span className="text-sm font-medium text-gray-600">
-    Total (TZS)
-    {rows.some((r) => category === 'trip' && r.bookingTruckSelection === ALL_TRUCKS) && (
-      <span className="block text-xs text-gray-400 font-normal">Includes lines applied to all trucks, multiplied per truck</span>
-    )}
-  </span>
-  <span className="text-lg font-bold text-gray-800">TZS {total.toLocaleString()}</span>
-</div>
+        <span className="text-sm font-medium text-gray-600">
+          Total (TZS)
+          {rows.some((r) => category === 'trip' && r.bookingTruckSelection === ALL_TRUCKS) && (
+            <span className="block text-xs text-gray-400 font-normal">Includes lines applied to all trucks, multiplied per truck</span>
+          )}
+        </span>
+        <span className="text-lg font-bold text-gray-800">TZS {total.toLocaleString()}</span>
+      </div>
 
       <button type="submit" disabled={isSubmitting}
         className="w-full bg-blue-600 text-white py-2.5 rounded-lg font-medium hover:bg-blue-700 transition-colors disabled:opacity-50 flex items-center justify-center gap-2">

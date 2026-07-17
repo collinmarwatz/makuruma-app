@@ -12,6 +12,7 @@ function ClientForm({ client, onSaved }: ClientFormProps) {
   const isEditMode = !!client
 
   const [companyName, setCompanyName] = useState(client?.company_name ?? '')
+  const [shortCode, setShortCode] = useState(client?.short_code ?? '')
   const [email, setEmail] = useState(client?.email ?? '')
   const [phone, setPhone] = useState(client?.phone ?? '')
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -23,7 +24,12 @@ function ClientForm({ client, onSaved }: ClientFormProps) {
     setIsSubmitting(true)
 
     try {
-      const payload = { company_name: companyName, email, phone }
+      const payload = {
+        company_name: companyName,
+        short_code: shortCode.toUpperCase(),
+        email,
+        phone,
+      }
       if (isEditMode) {
         await updateClient(client.id, payload)
       } else {
@@ -43,15 +49,29 @@ function ClientForm({ client, onSaved }: ClientFormProps) {
         <div className="bg-red-50 text-red-700 text-sm rounded-lg p-3 mb-4 border border-red-100">{error}</div>
       )}
 
-      <div className="mb-4">
-        <label className="block text-sm font-medium text-gray-700 mb-1">Company Name</label>
-        <input
-          type="text"
-          value={companyName}
-          onChange={(e) => setCompanyName(e.target.value)}
-          required
-          className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-        />
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Company Name</label>
+          <input
+            type="text"
+            value={companyName}
+            onChange={(e) => setCompanyName(e.target.value)}
+            required
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Short Code</label>
+          <input
+            type="text"
+            value={shortCode}
+            onChange={(e) => setShortCode(e.target.value.toUpperCase())}
+            maxLength={5}
+            placeholder="e.g. ALI"
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm uppercase focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          />
+          <p className="text-xs text-gray-400 mt-1">Used to generate Booking IDs — must be unique</p>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">

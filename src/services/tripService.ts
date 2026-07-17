@@ -13,6 +13,7 @@ export interface TruckAssignment {
   offloading_date?: string
   invoiced_transit_weight?: string
   invoiced_detention_charge?: string
+  exchange_rate?: string
 }
 
 export interface LegPayload {

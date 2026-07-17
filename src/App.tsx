@@ -4,12 +4,10 @@ import { useAuth } from './hooks/useAuth'
 import Layout from './components/Layout'
 import Login from './pages/Login'
 import Dashboard from './pages/Dashboard'
-import Trucks from './pages/Trucks'
 import Users from './pages/Users'
 import PageLoader from './components/ui/PageLoader'
 import Staff from './pages/Staff'
 import Drivers from './pages/Drivers'
-import Trailers from './pages/Trailers'
 import Clients from './pages/Clients'
 import Vendors from './pages/Vendors'
 import Bookings from './pages/Bookings'
@@ -17,6 +15,7 @@ import TripsOverview from './pages/TripsOverview'
 import Tracking from './pages/Tracking'
 import Expenses from './pages/Expenses'
 import Invoices from './pages/Invoices'
+import Assets from './pages/Assets'
 
 
 
@@ -44,11 +43,10 @@ function AppRoutes() {
         }
       >
         <Route path="/" element={<Dashboard />} />
-        <Route path="/trucks" element={<Trucks />} />
         <Route path="/users" element={<Users />} />
         <Route path="/staff" element={<Staff />} />
         <Route path="/drivers" element={<Drivers />} />
-        <Route path="/trailers" element={<Trailers />} />
+        <Route path="/assets" element={<Assets />} />
         <Route path="/clients" element={<Clients />} />
         <Route path="/vendors" element={<Vendors />} />
         <Route path="/bookings" element={<Bookings />} />

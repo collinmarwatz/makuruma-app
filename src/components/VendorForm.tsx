@@ -14,6 +14,7 @@ function VendorForm({ vendor, onSaved }: VendorFormProps) {
   const [companyName, setCompanyName] = useState(vendor?.company_name ?? '')
   const [vendorType, setVendorType] = useState<'fuel' | 'e-seal'>(vendor?.vendor_type ?? 'fuel')
   const [phone, setPhone] = useState(vendor?.phone ?? '')
+  const [location, setLocation] = useState(vendor?.location ?? '')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -23,7 +24,7 @@ function VendorForm({ vendor, onSaved }: VendorFormProps) {
     setIsSubmitting(true)
 
     try {
-      const payload = { company_name: companyName, vendor_type: vendorType, phone }
+      const payload = { company_name: companyName, vendor_type: vendorType, phone, location }
       if (isEditMode) {
         await updateVendor(vendor.id, payload)
       } else {
@@ -54,7 +55,7 @@ function VendorForm({ vendor, onSaved }: VendorFormProps) {
         />
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">Vendor Type</label>
           <select
@@ -75,6 +76,17 @@ function VendorForm({ vendor, onSaved }: VendorFormProps) {
             className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           />
         </div>
+      </div>
+
+      <div className="mb-6">
+        <label className="block text-sm font-medium text-gray-700 mb-1">Location</label>
+        <input
+          type="text"
+          value={location}
+          onChange={(e) => setLocation(e.target.value)}
+          placeholder="e.g. Tunduma, Dar es Salaam"
+          className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+        />
       </div>
 
       <button
