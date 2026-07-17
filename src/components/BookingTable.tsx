@@ -57,11 +57,11 @@ function BookingTable({ bookings, onEdit, onDelete, onDownload }: BookingTablePr
               <td className="px-4 py-3 text-gray-600">{bt.truck.current_location ?? '—'}</td>
               <td className="px-4 py-3 text-gray-600">{bt.driver?.phone ?? '—'}</td>
               <td className="px-4 py-3">
-                <Badge
-                  label={bt.truck.trip_status}
-                  color={bt.truck.trip_status === 'go' ? 'yellow' : bt.truck.trip_status === 'return' ? 'blue' as 'yellow' : 'green'}
-                />
-              </td>
+  <Badge
+    label={booking.direction === 'go' ? 'Go' : 'Return'}
+    color={booking.direction === 'go' ? 'yellow' : 'green'}
+  />
+</td>
               <td className="px-4 py-3">
                 <div className="flex justify-end gap-2">
                   <button onClick={() => onDownload(booking)} className="p-1.5 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors" title="Download access list">
