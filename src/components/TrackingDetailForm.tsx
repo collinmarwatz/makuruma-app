@@ -29,8 +29,11 @@ function TrackingDetailForm({ truck, onSaved }: TrackingDetailFormProps) {
   const [statusSaved, setStatusSaved] = useState(false)
   const [statusError, setStatusError] = useState<string | null>(null)
 
-  const [actualLoadingDate, setActualLoadingDate] = useState(recentBooking?.actual_loading_date?.slice(0, 10) ?? '')
-  const [actualOffloadingDate, setActualOffloadingDate] = useState(recentBooking?.actual_offloading_date?.slice(0, 10) ?? '')
+  const [loadingPointArrivalDate, setLoadingPointArrivalDate] = useState(recentBooking?.loading_point_arrival_date?.slice(0, 10) ?? '')
+  const [loadingDate, setLoadingDate] = useState(recentBooking?.loading_date?.slice(0, 10) ?? '')
+  const [loadingDispatchDate, setLoadingDispatchDate] = useState(recentBooking?.loading_dispatch_date?.slice(0, 10) ?? '')
+  const [offloadingPointArrivalDate, setOffloadingPointArrivalDate] = useState(recentBooking?.offloading_point_arrival_date?.slice(0, 10) ?? '')
+  const [offloadingDate, setOffloadingDate] = useState(recentBooking?.offloading_date?.slice(0, 10) ?? '')
   const [isSavingDates, setIsSavingDates] = useState(false)
   const [datesSaved, setDatesSaved] = useState(false)
   const [datesError, setDatesError] = useState<string | null>(null)
@@ -86,8 +89,11 @@ function TrackingDetailForm({ truck, onSaved }: TrackingDetailFormProps) {
     setDatesError(null)
     try {
       await updateTripDates(recentBooking.id, {
-        actual_loading_date: actualLoadingDate || undefined,
-        actual_offloading_date: actualOffloadingDate || undefined,
+        loading_point_arrival_date: loadingPointArrivalDate || undefined,
+        loading_date: loadingDate || undefined,
+        loading_dispatch_date: loadingDispatchDate || undefined,
+        offloading_point_arrival_date: offloadingPointArrivalDate || undefined,
+        offloading_date: offloadingDate || undefined,
       })
       setDatesSaved(true)
       onSaved()
@@ -178,17 +184,32 @@ function TrackingDetailForm({ truck, onSaved }: TrackingDetailFormProps) {
 
       {recentBooking && (
         <>
-          <h3 className="text-sm font-bold text-gray-600 mb-3">Actual Loading / Offloading Dates</h3>
+          <h3 className="text-sm font-bold text-gray-600 mb-3">Loading & Offloading Dates</h3>
           {datesError && <p className="text-sm text-red-600 mb-2">{datesError}</p>}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-3">
             <div>
-              <label className="block text-xs text-gray-500 mb-1">Actual Loading Date</label>
-              <input type="date" value={actualLoadingDate} onChange={(e) => setActualLoadingDate(e.target.value)}
+              <label className="block text-xs text-gray-500 mb-1">Date Arriving Loading Point</label>
+              <input type="date" value={loadingPointArrivalDate} onChange={(e) => setLoadingPointArrivalDate(e.target.value)}
                 className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" />
             </div>
             <div>
-              <label className="block text-xs text-gray-500 mb-1">Actual Offloading Date</label>
-              <input type="date" value={actualOffloadingDate} onChange={(e) => setActualOffloadingDate(e.target.value)}
+              <label className="block text-xs text-gray-500 mb-1">Date Loading</label>
+              <input type="date" value={loadingDate} onChange={(e) => setLoadingDate(e.target.value)}
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" />
+            </div>
+            <div>
+              <label className="block text-xs text-gray-500 mb-1">Date of Dispatch</label>
+              <input type="date" value={loadingDispatchDate} onChange={(e) => setLoadingDispatchDate(e.target.value)}
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" />
+            </div>
+            <div>
+              <label className="block text-xs text-gray-500 mb-1">Date Arrival at Offloading Point</label>
+              <input type="date" value={offloadingPointArrivalDate} onChange={(e) => setOffloadingPointArrivalDate(e.target.value)}
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" />
+            </div>
+            <div>
+              <label className="block text-xs text-gray-500 mb-1">Date Offloading</label>
+              <input type="date" value={offloadingDate} onChange={(e) => setOffloadingDate(e.target.value)}
                 className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" />
             </div>
           </div>

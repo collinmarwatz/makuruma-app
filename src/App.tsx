@@ -11,11 +11,11 @@ import Drivers from './pages/Drivers'
 import Clients from './pages/Clients'
 import Vendors from './pages/Vendors'
 import Bookings from './pages/Bookings'
-import TripsOverview from './pages/TripsOverview'
 import Tracking from './pages/Tracking'
 import Expenses from './pages/Expenses'
 import Invoices from './pages/Invoices'
 import Assets from './pages/Assets'
+import Trips from './pages/Trips'
 
 
 
@@ -43,17 +43,17 @@ function AppRoutes() {
         }
       >
         <Route path="/" element={<Dashboard />} />
-        <Route path="/users" element={<Users />} />
-        <Route path="/staff" element={<Staff />} />
-        <Route path="/drivers" element={<Drivers />} />
-        <Route path="/assets" element={<Assets />} />
-        <Route path="/clients" element={<Clients />} />
-        <Route path="/vendors" element={<Vendors />} />
-        <Route path="/bookings" element={<Bookings />} />
-        <Route path="/trips" element={<TripsOverview />} />
-        <Route path="/tracking" element={<Tracking />} />
-        <Route path="/expenses" element={<Expenses />} />
-        <Route path="/invoices" element={<Invoices />} />
+<Route path="/bookings" element={<Bookings />} />
+<Route path="/trips" element={<Trips />} />
+<Route path="/tracking" element={<Tracking />} />
+<Route path="/assets" element={<Assets />} />
+<Route path="/staff" element={<Staff />} />
+<Route path="/drivers" element={<Drivers />} />
+<Route path="/clients" element={<Clients />} />
+<Route path="/vendors" element={<Vendors />} />
+<Route path="/expenses" element={<Expenses />} />
+<Route path="/invoices" element={<Invoices />} />
+<Route path="/users" element={<Users />} />
       </Route>
     </Routes>
   )

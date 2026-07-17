@@ -10,22 +10,31 @@ function escapeCsvCell(value: string): string {
 
 export function exportTrackingCsv(trucks: TrackedTruck[]) {
   const headers = [
-    'Booking Number', 'Truck', 'Trailer', 'Driver',
-    'Loading Point', 'Offloading Point', 'Current Location', 'Current Status',
+    'Trip Code', 'Truck', 'Trailer', 'Driver', 'Driver Contact',
+    'Current Location', 'Current Status',
+    'Loading Point', 'Loading Arrival', 'Loading Date',
+    'Offloading Point', 'Dispatch', 'Offloading Arrival', 'Offloading Date',
   ]
 
   const rows = trucks.map((truck) => {
     const statusLabel = TRACKING_STATUS_OPTIONS.find((o) => o.value === truck.current_status)?.label ?? truck.current_status
     const recentBooking = truck.booking_trucks?.[0]
+
     return [
-      recentBooking?.trip_leg.trip.trip_number ?? '',
+      recentBooking?.trip?.trip_code ?? '',
       truck.reg_no,
       truck.trailer?.reg_no ?? '',
       truck.driver?.full_name ?? '',
-      recentBooking?.loading_point ?? '',
-      recentBooking?.offloading_point ?? '',
+      truck.driver?.phone ?? '',
       truck.current_location ?? '',
       statusLabel,
+      recentBooking?.booking.loading_point ?? '',
+      recentBooking?.loading_point_arrival_date?.slice(0, 10) ?? '',
+      recentBooking?.loading_date?.slice(0, 10) ?? '',
+      recentBooking?.booking.offloading_point ?? '',
+      recentBooking?.loading_dispatch_date?.slice(0, 10) ?? '',
+      recentBooking?.offloading_point_arrival_date?.slice(0, 10) ?? '',
+      recentBooking?.offloading_date?.slice(0, 10) ?? '',
     ].map((cell) => escapeCsvCell(String(cell)))
   })
 

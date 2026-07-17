@@ -20,8 +20,11 @@ export type TrackingStatus = 'pending' | 'loading' | 'in_transit' | 'at_border' 
 
 export interface RecentBooking {
   id: number
-  actual_loading_date: string | null
-  actual_offloading_date: string | null
+  loading_point_arrival_date: string | null
+  loading_date: string | null
+  loading_dispatch_date: string | null
+  offloading_point_arrival_date: string | null
+  offloading_date: string | null
   is_overdue: boolean
   documents: Document[]
   booking: {

@@ -33,14 +33,19 @@ export async function upsertMilestone(
 
 export async function updateTripDates(
   bookingTruckId: number,
-  data: { actual_loading_date?: string; actual_offloading_date?: string }
+  data: {
+    loading_point_arrival_date?: string
+    loading_date?: string
+    loading_dispatch_date?: string
+    offloading_point_arrival_date?: string
+    offloading_date?: string
+  }
 ) {
   return apiClient(`/booking-trucks/${bookingTruckId}/dates`, {
     method: 'PUT',
     body: JSON.stringify(data),
   })
 }
-
 export async function uploadProofOfDelivery(bookingTruckId: number, file: File) {
   const token = localStorage.getItem('auth_token')
   const formData = new FormData()
@@ -77,6 +82,38 @@ export async function downloadTrackingReport(truck: TrackedTruck): Promise<void>
   const link = document.createElement('a')
   link.href = url
   link.download = `tracking-${truck.reg_no}.pdf`
+  document.body.appendChild(link)
+  link.click()
+  link.remove()
+  window.URL.revokeObjectURL(url)
+}
+
+export async function downloadTrackingExcel(filters: {
+  trip_status?: string
+  current_status?: string
+  client_id?: string
+  search?: string
+}): Promise<void> {
+  const token = localStorage.getItem('auth_token')
+  const params = new URLSearchParams()
+  Object.entries(filters).forEach(([key, value]) => {
+    if (value) params.set(key, value)
+  })
+
+  const response = await fetch(`${API_BASE_URL}/tracking/export-excel?${params.toString()}`, {
+    headers: {
+      Accept: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+  })
+
+  if (!response.ok) throw new Error('Failed to export Excel')
+
+  const blob = await response.blob()
+  const url = window.URL.createObjectURL(blob)
+  const link = document.createElement('a')
+  link.href = url
+  link.download = `tracking-export-${new Date().toISOString().slice(0, 10)}.xlsx`
   document.body.appendChild(link)
   link.click()
   link.remove()
