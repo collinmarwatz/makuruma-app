@@ -11,7 +11,11 @@ export interface Truck {
   id: number
   reg_no: string
   capacity: string
+  buying_price: string | null
   status: "active" | "maintenance" | "decommissioned"
+  trip_status: "go" | "return" | "off_duty"
+  current_location: string | null
+  current_status: string
   trailer_id: number | null
   driver_id: number | null
   trailer: { id: number; reg_no: string } | null

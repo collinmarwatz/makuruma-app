@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
-import type { Trip } from '../types/trip'
-import { fetchTrips, deleteTrip, downloadBookingOrder } from '../services/tripService'
+import type { Booking } from '../types/booking'
+import { fetchBookings, deleteBooking, downloadBookingAccessList } from '../services/bookingService'
 import BookingForm from '../components/BookingForm'
 import BookingTable from '../components/BookingTable'
 import Modal from '../components/ui/Modal'
@@ -8,24 +8,22 @@ import TableSkeleton from '../components/ui/TableSkeleton'
 import { Plus } from 'lucide-react'
 
 function Bookings() {
-  const [trips, setTrips] = useState<Trip[]>([])
+  const [bookings, setBookings] = useState<Booking[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [reloadTrigger, setReloadTrigger] = useState(0)
   const [isModalOpen, setIsModalOpen] = useState(false)
-  const [editingTrip, setEditingTrip] = useState<Trip | null>(null)
+  const [editingBooking, setEditingBooking] = useState<Booking | null>(null)
+  const [newDirection, setNewDirection] = useState<'go' | 'return'>('go')
 
   useEffect(() => {
     let cancelled = false
 
     async function load() {
-      if (!cancelled) {
-        setLoading(true)
-        setError(null)
-      }
+      if (!cancelled) { setLoading(true); setError(null) }
       try {
-        const data = await fetchTrips()
-        if (!cancelled) setTrips(data)
+        const data = await fetchBookings()
+        if (!cancelled) setBookings(data)
       } catch (err) {
         if (!cancelled) setError(err instanceof Error ? err.message : 'Failed to load bookings')
       } finally {
@@ -34,43 +32,37 @@ function Bookings() {
     }
 
     load()
-    return () => {
-      cancelled = true
-    }
+    return () => { cancelled = true }
   }, [reloadTrigger])
 
-  function refresh() {
-    setReloadTrigger((prev) => prev + 1)
-  }
+  function refresh() { setReloadTrigger((prev) => prev + 1) }
 
-  function openAddModal() {
-    setEditingTrip(null)
+  function openAddModal(direction: 'go' | 'return') {
+    setNewDirection(direction)
+    setEditingBooking(null)
     setIsModalOpen(true)
   }
 
-  function openEditModal(trip: Trip) {
-    setEditingTrip(trip)
+  function openEditModal(booking: Booking) {
+    setEditingBooking(booking)
     setIsModalOpen(true)
   }
 
-  function handleSaved() {
-    setIsModalOpen(false)
-    refresh()
-  }
+  function handleSaved() { setIsModalOpen(false); refresh() }
 
-  async function handleDelete(trip: Trip) {
-    if (!window.confirm(`Delete booking ${trip.trip_number}? This can't be undone.`)) return
+  async function handleDelete(booking: Booking) {
+    if (!window.confirm(`Delete booking ${booking.booking_number}?`)) return
     try {
-      await deleteTrip(trip.id)
+      await deleteBooking(booking.id)
       refresh()
     } catch (err) {
       alert(err instanceof Error ? err.message : 'Failed to delete booking')
     }
   }
 
-  async function handleDownload(trip: Trip) {
+  async function handleDownload(booking: Booking) {
     try {
-      await downloadBookingOrder(trip)
+      await downloadBookingAccessList(booking)
     } catch (err) {
       alert(err instanceof Error ? err.message : 'Download failed')
     }
@@ -82,20 +74,30 @@ function Bookings() {
     <div className="min-h-screen bg-gray-50 p-8">
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold text-gray-800">Bookings</h1>
-        <button onClick={openAddModal} className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2.5 rounded-lg font-medium hover:bg-blue-700 transition-colors">
-          <Plus size={18} />
-          New Booking
-        </button>
+        <div className="flex gap-2">
+          <button onClick={() => openAddModal('go')} className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2.5 rounded-lg font-medium hover:bg-blue-700 transition-colors">
+            <Plus size={18} />
+            New Go Booking
+          </button>
+          <button onClick={() => openAddModal('return')} className="flex items-center gap-2 bg-white border border-gray-200 text-gray-700 px-4 py-2.5 rounded-lg font-medium hover:bg-gray-50 transition-colors">
+            <Plus size={18} />
+            New Return Booking
+          </button>
+        </div>
       </div>
 
       {loading ? (
-        <TableSkeleton columns={5} />
+        <TableSkeleton columns={13} />
       ) : (
-        <BookingTable trips={trips} onEdit={openEditModal} onDelete={handleDelete} onDownload={handleDownload} />
+        <BookingTable bookings={bookings} onEdit={openEditModal} onDelete={handleDelete} onDownload={handleDownload} />
       )}
 
-      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title={editingTrip ? `Edit Booking — ${editingTrip.trip_number}` : 'New Booking'}>
-        <BookingForm trip={editingTrip} onSaved={handleSaved} />
+      <Modal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        title={editingBooking ? `Edit Booking — ${editingBooking.booking_number}` : `New ${newDirection === 'go' ? 'Go' : 'Return'} Booking`}
+      >
+        <BookingForm booking={editingBooking} direction={newDirection} onSaved={handleSaved} />
       </Modal>
     </div>
   )

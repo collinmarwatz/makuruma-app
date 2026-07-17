@@ -34,13 +34,13 @@ function TrackingTable({ trucks, onView, onDownload }: TrackingTableProps) {
             return (
               <tr key={truck.id} className="hover:bg-gray-50 transition-colors">
                 <td className="px-4 py-3 font-medium text-gray-800">
-                  {recentBooking?.truck_trip_code ?? truck.reg_no}
+                  {recentBooking?.trip?.trip_code ?? truck.reg_no}
                 </td>
-                <td className="px-4 py-3 text-gray-600">{recentBooking?.trip_leg.client?.company_name ?? '—'}</td>
+                <td className="px-4 py-3 text-gray-600">{recentBooking?.booking.client?.company_name ?? '—'}</td>
                 <td className="px-4 py-3 text-gray-600">{truck.trailer?.reg_no ?? '—'}</td>
                 <td className="px-4 py-3 text-gray-600">{truck.driver?.full_name ?? '—'}</td>
-                <td className="px-4 py-3 text-gray-600">{recentBooking?.trip_leg.loading_point ?? '—'}</td>
-                <td className="px-4 py-3 text-gray-600">{recentBooking?.trip_leg.offloading_point ?? '—'}</td>
+                <td className="px-4 py-3 text-gray-600">{recentBooking?.booking.loading_point ?? '—'}</td>
+                <td className="px-4 py-3 text-gray-600">{recentBooking?.booking.offloading_point ?? '—'}</td>
                 <td className="px-4 py-3 text-gray-600">{truck.current_location ?? '—'}</td>
                 <td className="px-4 py-3">
                   <div className="flex items-center gap-1.5">

@@ -18,10 +18,15 @@ interface DocFieldState {
 
 type DocState = Record<string, DocFieldState>
 
-function initialDocState(): DocState {
+function initialDocState(driver?: Driver | null): DocState {
   const state: DocState = {}
   DRIVER_DOCUMENT_TYPES.forEach(({ key }) => {
-    state[key] = { number: '', expiryDate: '', attachment: null }
+    const existing = driver?.documents?.find((d) => d.document_type === key)
+    state[key] = {
+      number: existing?.number ?? '',
+      expiryDate: existing?.expiry_date?.slice(0, 10) ?? '',
+      attachment: null,
+    }
   })
   return state
 }
@@ -31,7 +36,7 @@ function DriverForm({ driver, onSaved }: DriverFormProps) {
 
   const [fullName, setFullName] = useState(driver?.full_name ?? '')
   const [phone, setPhone] = useState(driver?.phone ?? '')
-  const [docs, setDocs] = useState<DocState>(initialDocState())
+  const [docs, setDocs] = useState<DocState>(() => initialDocState(driver))
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -55,6 +60,7 @@ function DriverForm({ driver, onSaved }: DriverFormProps) {
 
         await createDocument('drivers', savedDriver.id, {
           document_type: key,
+          number: number || undefined,
           expiry_date: expiryDate,
           attachment,
         })
@@ -104,7 +110,9 @@ function DriverForm({ driver, onSaved }: DriverFormProps) {
                   className="w-full border border-gray-300 rounded-lg px-2 py-1.5 text-sm" />
               </div>
               <div>
-                <label className="block text-xs text-gray-500 mb-1">Attachment</label>
+                <label className="block text-xs text-gray-500 mb-1">
+                  Attachment {docs[key].attachment === null && isEditMode && '(leave blank to keep existing)'}
+                </label>
                 <input type="file" onChange={(e) => updateDoc(key, 'attachment', e.target.files?.[0] ?? null)} className="w-full text-xs" />
               </div>
             </div>

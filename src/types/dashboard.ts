@@ -23,13 +23,15 @@ export interface DashboardSummary {
     this_month: number
   }
   tracking: {
-    loading: number
-    in_transit: number
-    at_border: number
-    offloading: number
-    delayed: number
-    completed: number
-  }
+  pending: number
+  loading: number
+  in_transit: number
+  at_border: number
+  offloading: number
+  delayed: number
+  breakdown: number
+  completed: number
+}
   expenses: {
     pending_count: number
     pending_total: number

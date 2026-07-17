@@ -16,27 +16,27 @@ export interface TruckMilestone {
   dispatch_at: string | null
 }
 
-export type TrackingStatus = 'loading' | 'in_transit' | 'at_border' | 'offloading' | 'delayed' | 'breakdown' | 'completed'
+export type TrackingStatus = 'pending' | 'loading' | 'in_transit' | 'at_border' | 'offloading' | 'delayed' | 'breakdown' | 'completed'
 
 export interface RecentBooking {
   id: number
   actual_loading_date: string | null
   actual_offloading_date: string | null
   is_overdue: boolean
-  truck_trip_code: string
   documents: Document[]
-  trip_leg: {
+  booking: {
     direction: 'go' | 'return'
     loading_point: string | null
     offloading_point: string | null
     client: { id: number; company_name: string } | null
-    trip: { trip_number: string }
   }
+  trip: { id: number; trip_code: string } | null
 }
 
 export interface TrackedTruck extends Truck {
   trailer: Trailer | null
   driver: Driver | null
+  trip_status: 'go' | 'return' | 'off_duty'
   current_location: string | null
   current_status: TrackingStatus
   milestones: TruckMilestone[]

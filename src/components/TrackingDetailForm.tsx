@@ -27,11 +27,13 @@ function TrackingDetailForm({ truck, onSaved }: TrackingDetailFormProps) {
   const [status, setStatus] = useState<TrackingStatus>(truck.current_status)
   const [isSavingStatus, setIsSavingStatus] = useState(false)
   const [statusSaved, setStatusSaved] = useState(false)
+  const [statusError, setStatusError] = useState<string | null>(null)
 
   const [actualLoadingDate, setActualLoadingDate] = useState(recentBooking?.actual_loading_date?.slice(0, 10) ?? '')
   const [actualOffloadingDate, setActualOffloadingDate] = useState(recentBooking?.actual_offloading_date?.slice(0, 10) ?? '')
   const [isSavingDates, setIsSavingDates] = useState(false)
   const [datesSaved, setDatesSaved] = useState(false)
+  const [datesError, setDatesError] = useState<string | null>(null)
 
   const [podFile, setPodFile] = useState<File | null>(null)
   const [isUploadingPod, setIsUploadingPod] = useState(false)
@@ -40,10 +42,12 @@ function TrackingDetailForm({ truck, onSaved }: TrackingDetailFormProps) {
   const [milestones, setMilestones] = useState<Record<number, MilestoneInput>>({})
   const [savingCheckpointId, setSavingCheckpointId] = useState<number | null>(null)
   const [savedCheckpointId, setSavedCheckpointId] = useState<number | null>(null)
+  const [milestoneError, setMilestoneError] = useState<string | null>(null)
 
   useEffect(() => {
     fetchCheckpoints().then((data) => {
-      setCheckpoints(data)
+      const ordered = truck.trip_status === 'return' ? [...data].reverse() : data
+      setCheckpoints(ordered)
       const initial: Record<number, MilestoneInput> = {}
       data.forEach((cp) => {
         const existing = truck.milestones.find((m) => m.checkpoint.id === cp.id)
@@ -63,10 +67,13 @@ function TrackingDetailForm({ truck, onSaved }: TrackingDetailFormProps) {
   async function handleStatusSave() {
     setIsSavingStatus(true)
     setStatusSaved(false)
+    setStatusError(null)
     try {
       await updateTrackingStatus(truck.id, { current_location: location || undefined, current_status: status })
       setStatusSaved(true)
       onSaved()
+    } catch (err) {
+      setStatusError(err instanceof Error ? err.message : 'Failed to update status')
     } finally {
       setIsSavingStatus(false)
     }
@@ -76,6 +83,7 @@ function TrackingDetailForm({ truck, onSaved }: TrackingDetailFormProps) {
     if (!recentBooking) return
     setIsSavingDates(true)
     setDatesSaved(false)
+    setDatesError(null)
     try {
       await updateTripDates(recentBooking.id, {
         actual_loading_date: actualLoadingDate || undefined,
@@ -83,6 +91,8 @@ function TrackingDetailForm({ truck, onSaved }: TrackingDetailFormProps) {
       })
       setDatesSaved(true)
       onSaved()
+    } catch (err) {
+      setDatesError(err instanceof Error ? err.message : 'Failed to save dates')
     } finally {
       setIsSavingDates(false)
     }
@@ -106,6 +116,7 @@ function TrackingDetailForm({ truck, onSaved }: TrackingDetailFormProps) {
   async function handleMilestoneSave(checkpointId: number) {
     setSavingCheckpointId(checkpointId)
     setSavedCheckpointId(null)
+    setMilestoneError(null)
     try {
       const { arrivalAt, dispatchAt } = milestones[checkpointId]
       await upsertMilestone(truck.id, {
@@ -115,6 +126,8 @@ function TrackingDetailForm({ truck, onSaved }: TrackingDetailFormProps) {
       })
       setSavedCheckpointId(checkpointId)
       onSaved()
+    } catch (err) {
+      setMilestoneError(err instanceof Error ? err.message : 'Failed to save milestone')
     } finally {
       setSavingCheckpointId(null)
     }
@@ -124,13 +137,13 @@ function TrackingDetailForm({ truck, onSaved }: TrackingDetailFormProps) {
     <div>
       <div className="bg-gray-50 rounded-lg p-4 mb-6">
         <p className="font-medium text-gray-800">
-          {recentBooking?.truck_trip_code ?? truck.reg_no} — {truck.trailer?.reg_no ?? 'no trailer'} — {truck.driver?.full_name ?? 'no driver'}
+          {recentBooking?.trip?.trip_code ?? truck.reg_no} — {truck.trailer?.reg_no ?? 'no trailer'} — {truck.driver?.full_name ?? 'no driver'}
         </p>
         {recentBooking ? (
           <>
-            <p className="text-sm text-gray-500 mt-1">Client: {recentBooking.trip_leg.client?.company_name ?? '—'}</p>
+            <p className="text-sm text-gray-500 mt-1">Client: {recentBooking.booking.client?.company_name ?? '—'}</p>
             <p className="text-sm text-gray-500">
-              {recentBooking.trip_leg.loading_point ?? '—'} → {recentBooking.trip_leg.offloading_point ?? '—'}
+              {recentBooking.booking.loading_point ?? '—'} → {recentBooking.booking.offloading_point ?? '—'}
             </p>
             {recentBooking.is_overdue && (
               <p className="text-sm text-red-600 font-medium mt-1">⚠ Past ETA — not yet completed</p>
@@ -142,6 +155,7 @@ function TrackingDetailForm({ truck, onSaved }: TrackingDetailFormProps) {
       </div>
 
       <h3 className="text-sm font-bold text-gray-600 mb-3">Current Status</h3>
+      {statusError && <p className="text-sm text-red-600 mb-2">{statusError}</p>}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
         <div>
           <label className="block text-xs text-gray-500 mb-1">Current Location</label>
@@ -165,6 +179,7 @@ function TrackingDetailForm({ truck, onSaved }: TrackingDetailFormProps) {
       {recentBooking && (
         <>
           <h3 className="text-sm font-bold text-gray-600 mb-3">Actual Loading / Offloading Dates</h3>
+          {datesError && <p className="text-sm text-red-600 mb-2">{datesError}</p>}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
             <div>
               <label className="block text-xs text-gray-500 mb-1">Actual Loading Date</label>
@@ -203,7 +218,10 @@ function TrackingDetailForm({ truck, onSaved }: TrackingDetailFormProps) {
         </>
       )}
 
-      <h3 className="text-sm font-bold text-gray-600 mb-3">Checkpoint Milestones</h3>
+      <h3 className="text-sm font-bold text-gray-600 mb-3">
+        Checkpoint Milestones {truck.trip_status === 'return' && <span className="font-normal text-gray-400">(Return order)</span>}
+      </h3>
+      {milestoneError && <p className="text-sm text-red-600 mb-2">{milestoneError}</p>}
       <div className="space-y-3">
         {checkpoints.map((cp) => (
           <div key={cp.id} className="bg-gray-50 rounded-lg p-3">
