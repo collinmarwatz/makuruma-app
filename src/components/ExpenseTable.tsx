@@ -1,4 +1,5 @@
 import type { ExpenseOrder } from '../types/expense'
+import { LINE_CATEGORIES } from '../constants/expenseLineCategories'
 import Badge from './ui/Badge'
 import { Pencil, Trash2, Check, X, DollarSign, Download, FileSpreadsheet } from 'lucide-react'
 
@@ -12,6 +13,7 @@ interface ExpenseTableProps {
   onMarkPaid: (expense: ExpenseOrder) => void
   onDownload: (expense: ExpenseOrder) => void
   onDownloadExcel: (expense: ExpenseOrder) => void
+  onDownloadCategory: (expense: ExpenseOrder, category: string) => void
 }
 
 const statusColors: Record<string, 'green' | 'yellow' | 'red' | 'gray'> = {
@@ -19,6 +21,10 @@ const statusColors: Record<string, 'green' | 'yellow' | 'red' | 'gray'> = {
   approved: 'gray',
   rejected: 'red',
   paid: 'green',
+}
+
+function categoriesPresent(exp: ExpenseOrder): string[] {
+  return Array.from(new Set(exp.lines.map((l) => l.line_category)))
 }
 
 function ExpenseTable({
@@ -31,6 +37,7 @@ function ExpenseTable({
   onMarkPaid,
   onDownload,
   onDownloadExcel,
+  onDownloadCategory,
 }: ExpenseTableProps) {
   const canApprove = userRoleSlug === 'manager' || userRoleSlug === 'admin'
   const canPay = userRoleSlug === 'accountant' || userRoleSlug === 'admin'
@@ -59,7 +66,7 @@ function ExpenseTable({
               <td className="px-4 py-3 font-medium text-gray-800">{exp.order_number}</td>
               <td className="px-4 py-3 text-gray-600 capitalize">{exp.category}</td>
               <td className="px-4 py-3 text-gray-600">
-                {exp.trip?.trip_number ?? exp.truck?.reg_no ?? '—'}
+                {exp.booking?.booking_number ?? exp.truck?.reg_no ?? '—'}
               </td>
               <td className="px-4 py-3 text-gray-600">{exp.creator.name}</td>
               <td className="px-4 py-3 text-gray-600">{exp.initiated_by ?? '—'}</td>
@@ -84,10 +91,23 @@ function ExpenseTable({
                   <button
                     onClick={() => onDownloadExcel(exp)}
                     className="p-1.5 text-gray-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors"
-                    title="Download Excel"
+                    title="Download Excel (all lines)"
                   >
                     <FileSpreadsheet size={16} />
                   </button>
+                  {categoriesPresent(exp).map((cat) => {
+                    const label = LINE_CATEGORIES.find((c) => c.value === cat)?.label ?? cat
+                    return (
+                      <button
+                        key={cat}
+                        onClick={() => onDownloadCategory(exp, cat)}
+                        className="p-1.5 text-gray-400 hover:text-purple-600 hover:bg-purple-50 rounded-lg transition-colors"
+                        title={`Download ${label} export`}
+                      >
+                        <FileSpreadsheet size={16} />
+                      </button>
+                    )
+                  })}
                   {exp.status === 'pending' && canApprove && (
                     <>
                       <button

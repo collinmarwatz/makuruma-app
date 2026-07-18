@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import type { ExpenseOrder, ExpenseCategory } from '../types/expense'
+import type { ExpenseOrder, ExpenseCategory, LineCategory } from '../types/expense'
 import {
   fetchExpenseOrders,
   deleteExpenseOrder,
@@ -8,16 +8,15 @@ import {
   markExpensePaid,
   downloadExpenseOrder,
   downloadExpenseOrderExcel,
+  downloadExpenseCategory,
 } from '../services/expenseService'
 import { useAuth } from '../hooks/useAuth'
+import { LINE_CATEGORIES } from '../constants/expenseLineCategories'
 import ExpenseForm from '../components/ExpenseForm'
 import ExpenseTable from '../components/ExpenseTable'
 import Modal from '../components/ui/Modal'
 import TableSkeleton from '../components/ui/TableSkeleton'
 import { Plus } from 'lucide-react'
-import { LINE_CATEGORIES } from '../constants/expenseLineCategories'
-import type { LineCategory } from '../types/expense'
-
 
 function Expenses() {
   const { user } = useAuth()
@@ -28,9 +27,9 @@ function Expenses() {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [editingExpense, setEditingExpense] = useState<ExpenseOrder | null>(null)
   const [categoryFilter, setCategoryFilter] = useState<ExpenseCategory | 'all'>('all')
+  const [lineCategoryFilter, setLineCategoryFilter] = useState<LineCategory | 'all'>('all')
   const [dateFrom, setDateFrom] = useState('')
   const [dateTo, setDateTo] = useState('')
-  const [lineCategoryFilter, setLineCategoryFilter] = useState<LineCategory | 'all'>('all')
 
   useEffect(() => {
     let cancelled = false
@@ -60,15 +59,15 @@ function Expenses() {
   }, [reloadTrigger, dateFrom, dateTo])
 
   const filteredExpenses = useMemo(() => {
-  return expenses.filter((exp) => {
-    const matchesOrderCategory = categoryFilter === 'all' || exp.category === categoryFilter
-    const matchesLineCategory =
-      lineCategoryFilter === 'all' ||
-      exp.lines.some((line) => line.line_category === lineCategoryFilter)
+    return expenses.filter((exp) => {
+      const matchesOrderCategory = categoryFilter === 'all' || exp.category === categoryFilter
+      const matchesLineCategory =
+        lineCategoryFilter === 'all' ||
+        exp.lines.some((line) => line.line_category === lineCategoryFilter)
 
-    return matchesOrderCategory && matchesLineCategory
-  })
-}, [expenses, categoryFilter, lineCategoryFilter])
+      return matchesOrderCategory && matchesLineCategory
+    })
+  }, [expenses, categoryFilter, lineCategoryFilter])
 
   const categoryCounts = useMemo(() => {
     return {
@@ -77,6 +76,16 @@ function Expenses() {
       office: expenses.filter((e) => e.category === 'office').length,
       truck: expenses.filter((e) => e.category === 'truck').length,
     }
+  }, [expenses])
+
+  const lineCategoryCounts = useMemo(() => {
+    const counts: Record<string, number> = { all: expenses.length }
+    LINE_CATEGORIES.forEach((cat) => {
+      counts[cat.value] = expenses.filter((exp) =>
+        exp.lines.some((line) => line.line_category === cat.value)
+      ).length
+    })
+    return counts
   }, [expenses])
 
   function refresh() {
@@ -156,6 +165,14 @@ function Expenses() {
     }
   }
 
+  async function handleDownloadCategory(expense: ExpenseOrder, category: string) {
+    try {
+      await downloadExpenseCategory(expense, category)
+    } catch (err) {
+      alert(err instanceof Error ? err.message : 'Download failed')
+    }
+  }
+
   if (error) return <p className="p-8 text-red-500">Error: {error}</p>
 
   const categoryTabs: { value: ExpenseCategory | 'all'; label: string }[] = [
@@ -193,6 +210,19 @@ function Expenses() {
           ))}
         </div>
 
+        <select
+          value={lineCategoryFilter}
+          onChange={(e) => setLineCategoryFilter(e.target.value as LineCategory | 'all')}
+          className="border border-gray-300 rounded-lg px-3 py-2 text-sm"
+        >
+          <option value="all">All Expense Types ({lineCategoryCounts.all})</option>
+          {LINE_CATEGORIES.map((cat) => (
+            <option key={cat.value} value={cat.value}>
+              {cat.label} ({lineCategoryCounts[cat.value] ?? 0})
+            </option>
+          ))}
+        </select>
+
         <div className="flex items-center gap-2">
           <label className="text-xs text-gray-500">From</label>
           <input type="date" value={dateFrom} onChange={(e) => setDateFrom(e.target.value)}
@@ -205,16 +235,6 @@ function Expenses() {
               Clear
             </button>
           )}
-          <select
-  value={lineCategoryFilter}
-  onChange={(e) => setLineCategoryFilter(e.target.value as LineCategory | 'all')}
-  className="border border-gray-300 rounded-lg px-3 py-2 text-sm"
->
-  <option value="all">All Expense Types</option>
-  {LINE_CATEGORIES.map((cat) => (
-    <option key={cat.value} value={cat.value}>{cat.label}</option>
-  ))}
-</select>
         </div>
       </div>
 
@@ -231,6 +251,7 @@ function Expenses() {
           onMarkPaid={handleMarkPaid}
           onDownload={handleDownload}
           onDownloadExcel={handleDownloadExcel}
+          onDownloadCategory={handleDownloadCategory}
         />
       )}
 

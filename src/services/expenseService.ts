@@ -84,6 +84,32 @@ export async function downloadExpenseOrder(expense: ExpenseOrder): Promise<void>
   window.URL.revokeObjectURL(url)
 }
 
+export async function downloadExpenseCategory(expense: ExpenseOrder, category: string): Promise<void> {
+  const token = localStorage.getItem('auth_token')
+
+  const response = await fetch(`${API_BASE_URL}/expense-orders/${expense.id}/download-category/${category}`, {
+    headers: {
+      Accept: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+  })
+
+  if (!response.ok) {
+    const err = await response.json().catch(() => null)
+    throw new Error(err?.message || 'Failed to download category export')
+  }
+
+  const blob = await response.blob()
+  const url = window.URL.createObjectURL(blob)
+  const link = document.createElement('a')
+  link.href = url
+  link.download = `${expense.order_number}-${category}.xlsx`
+  document.body.appendChild(link)
+  link.click()
+  link.remove()
+  window.URL.revokeObjectURL(url)
+}
+
 export async function downloadExpenseOrderExcel(expense: ExpenseOrder): Promise<void> {
   const token = localStorage.getItem('auth_token')
 
