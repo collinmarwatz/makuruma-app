@@ -11,12 +11,14 @@ export interface ExpenseLineInput {
   description: string
   currency: Currency
   exchange_rate: string
-  original_amount: string
+  quantity?: string
+  unit_rate?: string
+  original_amount?: string
 }
 
 export interface CreateExpenseData {
   category: ExpenseCategory
-  trip_id?: string
+  booking_id?: string
   truck_id?: string
   payment_account?: string
   initiated_by?: string

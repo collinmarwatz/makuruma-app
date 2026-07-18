@@ -1,4 +1,3 @@
-import type { Trip } from './trip'
 import type { Truck } from './truck'
 
 export type ExpenseCategory = 'trip' | 'office' | 'truck'
@@ -10,18 +9,15 @@ export interface ExpenseLine {
   id: number
   line_category: LineCategory
   vendor: { id: number; company_name: string } | null
-  booking_truck: { id: number; truck: { reg_no: string } } | null
+  booking_truck: { id: number; truck: { reg_no: string }; trip: { trip_code: string } | null } | null
   group_key: string | null
   description: string
   currency: Currency
   exchange_rate: string
+  quantity: string | null
+  unit_rate: string | null
   original_amount: string
   amount: string
-}
-
-export interface ExpenseUser {
-  id: number
-  name: string
 }
 
 export interface ExpenseOrder {
@@ -33,7 +29,7 @@ export interface ExpenseOrder {
   payment_account: string | null
   initiated_by: string | null
   payment_date: string | null
-  trip: Trip | null
+  booking: { id: number; booking_number: string; direction: 'go' | 'return'; client: { company_name: string } } | null
   truck: Truck | null
   creator: ExpenseUser
   approver: ExpenseUser | null
@@ -42,4 +38,9 @@ export interface ExpenseOrder {
   paid_at: string | null
   lines: ExpenseLine[]
   created_at: string
+}
+
+export interface ExpenseUser {
+  id: number
+  name: string
 }

@@ -15,6 +15,9 @@ import ExpenseTable from '../components/ExpenseTable'
 import Modal from '../components/ui/Modal'
 import TableSkeleton from '../components/ui/TableSkeleton'
 import { Plus } from 'lucide-react'
+import { LINE_CATEGORIES } from '../constants/expenseLineCategories'
+import type { LineCategory } from '../types/expense'
+
 
 function Expenses() {
   const { user } = useAuth()
@@ -27,6 +30,7 @@ function Expenses() {
   const [categoryFilter, setCategoryFilter] = useState<ExpenseCategory | 'all'>('all')
   const [dateFrom, setDateFrom] = useState('')
   const [dateTo, setDateTo] = useState('')
+  const [lineCategoryFilter, setLineCategoryFilter] = useState<LineCategory | 'all'>('all')
 
   useEffect(() => {
     let cancelled = false
@@ -56,9 +60,15 @@ function Expenses() {
   }, [reloadTrigger, dateFrom, dateTo])
 
   const filteredExpenses = useMemo(() => {
-    if (categoryFilter === 'all') return expenses
-    return expenses.filter((exp) => exp.category === categoryFilter)
-  }, [expenses, categoryFilter])
+  return expenses.filter((exp) => {
+    const matchesOrderCategory = categoryFilter === 'all' || exp.category === categoryFilter
+    const matchesLineCategory =
+      lineCategoryFilter === 'all' ||
+      exp.lines.some((line) => line.line_category === lineCategoryFilter)
+
+    return matchesOrderCategory && matchesLineCategory
+  })
+}, [expenses, categoryFilter, lineCategoryFilter])
 
   const categoryCounts = useMemo(() => {
     return {
@@ -195,6 +205,16 @@ function Expenses() {
               Clear
             </button>
           )}
+          <select
+  value={lineCategoryFilter}
+  onChange={(e) => setLineCategoryFilter(e.target.value as LineCategory | 'all')}
+  className="border border-gray-300 rounded-lg px-3 py-2 text-sm"
+>
+  <option value="all">All Expense Types</option>
+  {LINE_CATEGORIES.map((cat) => (
+    <option key={cat.value} value={cat.value}>{cat.label}</option>
+  ))}
+</select>
         </div>
       </div>
 
