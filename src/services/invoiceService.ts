@@ -14,6 +14,7 @@ export interface CreateInvoiceData {
   invoice_type: InvoiceType
   booking_id: string
   invoice_date: string
+  exchange_rate: string
   deal_no?: string
   bivac_no?: string
   mode_of_payment?: string

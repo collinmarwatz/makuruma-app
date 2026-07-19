@@ -10,8 +10,7 @@ import { MapPin } from 'lucide-react'
 import { Receipt } from 'lucide-react'
 import { FileText } from 'lucide-react'
 import { Package } from 'lucide-react'
-
-
+import { FileBarChart } from 'lucide-react'
 
 
 const navItems = [
@@ -26,6 +25,7 @@ const navItems = [
   { to: '/vendors', label: 'Vendors', icon: Store },
   { to: '/expenses', label: 'Expenses', icon: Receipt },
   { to: '/invoices', label: 'Invoices', icon: FileText },
+  { to: '/reports', label: 'Reports', icon: FileBarChart },
   { to: '/users', label: 'Users', icon: UsersIcon },
 ]
 

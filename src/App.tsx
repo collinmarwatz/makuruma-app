@@ -16,6 +16,7 @@ import Expenses from './pages/Expenses'
 import Invoices from './pages/Invoices'
 import Assets from './pages/Assets'
 import Trips from './pages/Trips'
+import Reports from './pages/Reports'
 
 
 
@@ -54,6 +55,8 @@ function AppRoutes() {
 <Route path="/expenses" element={<Expenses />} />
 <Route path="/invoices" element={<Invoices />} />
 <Route path="/users" element={<Users />} />
+<Route path="/reports" element={<Reports />} />
+
       </Route>
     </Routes>
   )
