@@ -4,6 +4,8 @@ export interface Client {
   short_code: string | null
   email: string | null
   phone: string | null
+  allows_advance_invoice: boolean
+
 }
 
 export interface Vendor {

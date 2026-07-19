@@ -1,5 +1,7 @@
 import type { Client } from '../types/partner'
+import Badge from './ui/Badge'
 import { Pencil, Trash2 } from 'lucide-react'
+
 
 interface ClientTableProps {
   clients: Client[]
@@ -16,6 +18,7 @@ function ClientTable({ clients, onEdit, onDelete }: ClientTableProps) {
             <th className="px-4 py-3">Company Name</th>
             <th className="px-4 py-3">Email</th>
             <th className="px-4 py-3">Phone</th>
+            <th className="px-4 py-3">Advance Invoicing</th>
             <th className="px-4 py-3 text-right">Actions</th>
           </tr>
         </thead>
@@ -25,6 +28,9 @@ function ClientTable({ clients, onEdit, onDelete }: ClientTableProps) {
               <td className="px-4 py-3 font-medium text-gray-800">{client.company_name}</td>
               <td className="px-4 py-3 text-gray-600">{client.email ?? '—'}</td>
               <td className="px-4 py-3 text-gray-600">{client.phone ?? '—'}</td>
+              <td className="px-4 py-3">
+  <Badge label={client.allows_advance_invoice ? 'Allowed' : 'Not Allowed'} color={client.allows_advance_invoice ? 'green' : 'gray'} />
+</td>
               <td className="px-4 py-3">
                 <div className="flex justify-end gap-2">
                   <button onClick={() => onEdit(client)} className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors" title="Edit client">

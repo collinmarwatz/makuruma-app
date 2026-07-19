@@ -48,7 +48,7 @@ function Invoices() {
   }
 
   async function handleDelete(invoice: Invoice) {
-    if (!window.confirm(`Delete invoice ${invoice.invoice_number}? Its bookings will become available to invoice again.`)) return
+    if (!window.confirm(`Delete invoice ${invoice.invoice_number}?`)) return
     try {
       await deleteInvoice(invoice.id)
       refresh()
@@ -71,17 +71,14 @@ function Invoices() {
     <div className="min-h-screen bg-gray-50 p-8">
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold text-gray-800">Invoices</h1>
-        <button
-          onClick={() => setIsModalOpen(true)}
-          className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2.5 rounded-lg font-medium hover:bg-blue-700 transition-colors"
-        >
+        <button onClick={() => setIsModalOpen(true)} className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2.5 rounded-lg font-medium hover:bg-blue-700 transition-colors">
           <Plus size={18} />
           New Invoice
         </button>
       </div>
 
       {loading ? (
-        <TableSkeleton columns={7} />
+        <TableSkeleton columns={9} />
       ) : (
         <InvoiceTable invoices={invoices} onDelete={handleDelete} onDownload={handleDownload} />
       )}

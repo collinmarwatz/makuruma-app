@@ -17,6 +17,7 @@ function ClientForm({ client, onSaved }: ClientFormProps) {
   const [phone, setPhone] = useState(client?.phone ?? '')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [allowsAdvanceInvoice, setAllowsAdvanceInvoice] = useState(client?.allows_advance_invoice ?? false)
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
@@ -29,6 +30,8 @@ function ClientForm({ client, onSaved }: ClientFormProps) {
         short_code: shortCode.toUpperCase(),
         email,
         phone,
+        allows_advance_invoice: allowsAdvanceInvoice,
+
       }
       if (isEditMode) {
         await updateClient(client.id, payload)
@@ -93,6 +96,20 @@ function ClientForm({ client, onSaved }: ClientFormProps) {
             className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           />
         </div>
+        <div className="mb-6">
+  <label className="flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
+    <input
+      type="checkbox"
+      checked={allowsAdvanceInvoice}
+      onChange={(e) => setAllowsAdvanceInvoice(e.target.checked)}
+      className="cursor-pointer"
+    />
+    Allow Advance Invoices for this client
+  </label>
+  <p className="text-xs text-gray-400 mt-1 ml-6">
+    Only clients with this enabled can be issued an Advance-type invoice.
+  </p>
+</div>
       </div>
 
       <button

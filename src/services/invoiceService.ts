@@ -1,21 +1,40 @@
-import type { Invoice, InvoiceableLeg } from '../types/invoice'
+import type { Invoice, InvoiceType, EligibleInvoiceTruck } from '../types/invoice'
 import { apiClient } from './apiClient'
 
 const API_BASE_URL = 'http://127.0.0.1:8000/api'
 
+export interface InvoiceLineInput {
+  booking_truck_id: string
+  quantity: string
+  rate: string
+  days?: string
+}
+
 export interface CreateInvoiceData {
-  client_id: string
+  invoice_type: InvoiceType
+  booking_id: string
   invoice_date: string
+  deal_no?: string
+  bivac_no?: string
   mode_of_payment?: string
-  booking_truck_ids: string[]
+  delivery_note_no?: string
+  delivery_note_date?: string
+  supplier_ref?: string
+  other_ref?: string
+  loading_con_no?: string
+  settlement_no?: string
+  dispatched_through?: string
+  destination?: string
+  terms_of_delivery?: string
+  lines: InvoiceLineInput[]
 }
 
 export async function fetchInvoices(): Promise<Invoice[]> {
   return apiClient('/invoices')
 }
 
-export async function fetchInvoiceableLegs(clientId: string): Promise<InvoiceableLeg[]> {
-  return apiClient(`/invoices/invoiceable-legs?client_id=${clientId}`)
+export async function fetchEligibleInvoiceTrucks(bookingId: string, invoiceType: InvoiceType): Promise<EligibleInvoiceTruck[]> {
+  return apiClient(`/invoices/eligible-trucks?booking_id=${bookingId}&invoice_type=${invoiceType}`)
 }
 
 export async function createInvoice(data: CreateInvoiceData): Promise<Invoice> {
