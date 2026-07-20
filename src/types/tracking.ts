@@ -28,6 +28,7 @@ export interface RecentBooking {
   is_overdue: boolean
   documents: Document[]
   booking: {
+    booking_number: string
     direction: 'go' | 'return'
     loading_point: string | null
     offloading_point: string | null

@@ -20,12 +20,12 @@ function ExpenseByCategoryChart({ data }: ExpenseByCategoryChartProps) {
   return (
     <ResponsiveContainer width="100%" height={220}>
       <PieChart>
-        <Pie data={chartData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={80} label={(entry) => `$${entry.value.toLocaleString()}`}>
+        <Pie data={chartData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={80} label={(entry) => `Sh${entry.value.toLocaleString()}`}>
           {chartData.map((_, index) => (
             <Cell key={index} fill={COLORS[index % COLORS.length]} />
           ))}
         </Pie>
-        <Tooltip formatter={(value) => `$${Number(value).toLocaleString()}`} />
+        <Tooltip formatter={(value) => `Tsh${Number(value).toLocaleString()}`} />
         <Legend />
       </PieChart>
     </ResponsiveContainer>

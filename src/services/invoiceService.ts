@@ -5,8 +5,11 @@ const API_BASE_URL = 'http://127.0.0.1:8000/api'
 
 export interface InvoiceLineInput {
   booking_truck_id: string
-  quantity: string
-  rate: string
+  quantity?: string
+  rate?: string
+  percentage?: string
+  is_flat_amount?: boolean
+  flat_amount?: string
   days?: string
 }
 
@@ -30,8 +33,15 @@ export interface CreateInvoiceData {
   lines: InvoiceLineInput[]
 }
 
-export async function fetchInvoices(): Promise<Invoice[]> {
-  return apiClient('/invoices')
+export async function fetchInvoices(filters?: { booking_number?: string }): Promise<Invoice[]> {
+  const params = new URLSearchParams()
+  if (filters?.booking_number) params.set('booking_number', filters.booking_number)
+  const query = params.toString()
+  return apiClient(`/invoices${query ? `?${query}` : ''}`)
+}
+
+export async function markInvoicePaid(id: number): Promise<Invoice> {
+  return apiClient(`/invoices/${id}/mark-paid`, { method: 'POST' })
 }
 
 export async function fetchEligibleInvoiceTrucks(bookingId: string, invoiceType: InvoiceType): Promise<EligibleInvoiceTruck[]> {
@@ -44,6 +54,10 @@ export async function createInvoice(data: CreateInvoiceData): Promise<Invoice> {
 
 export async function deleteInvoice(id: number): Promise<void> {
   return apiClient(`/invoices/${id}`, { method: 'DELETE' })
+}
+
+export async function updateInvoice(id: number, data: Omit<CreateInvoiceData, 'invoice_type' | 'booking_id'>): Promise<Invoice> {
+  return apiClient(`/invoices/${id}`, { method: 'PUT', body: JSON.stringify(data) })
 }
 
 export async function downloadInvoice(invoice: Invoice): Promise<void> {

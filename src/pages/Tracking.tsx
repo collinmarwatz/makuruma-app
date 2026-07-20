@@ -24,6 +24,7 @@ function Tracking() {
   const [searchTerm, setSearchTerm] = useState('')
   const [statusFilter, setStatusFilter] = useState<TrackingStatus | 'all'>('all')
   const [clientFilter, setClientFilter] = useState('')
+  const [bookingNumberFilter, setBookingNumberFilter] = useState('')
   const [clients, setClients] = useState<Client[]>([])
   const [isExporting, setIsExporting] = useState(false)
   const [isExportingExcel, setIsExportingExcel] = useState(false)
@@ -78,6 +79,9 @@ function Tracking() {
       const matchesStatus = statusFilter === 'all' || truck.current_status === statusFilter
       const recentBooking = truck.booking_trucks?.[0]
       const matchesClient = !clientFilter || recentBooking?.booking.client?.id.toString() === clientFilter
+      const matchesBookingNumber =
+        !bookingNumberFilter ||
+        (recentBooking?.booking.booking_number?.toLowerCase().includes(bookingNumberFilter.toLowerCase()) ?? false)
       const search = searchTerm.trim().toLowerCase()
       const matchesSearch =
         !search ||
@@ -85,9 +89,9 @@ function Tracking() {
         (truck.driver?.full_name.toLowerCase().includes(search) ?? false) ||
         (recentBooking?.trip?.trip_code.toLowerCase().includes(search) ?? false)
 
-      return matchesTab && matchesStatus && matchesClient && matchesSearch
+      return matchesTab && matchesStatus && matchesClient && matchesBookingNumber && matchesSearch
     })
-  }, [trucks, searchTerm, statusFilter, clientFilter, tripStatusTab])
+  }, [trucks, searchTerm, statusFilter, clientFilter, bookingNumberFilter, tripStatusTab])
 
   function refresh() {
     setReloadTrigger((prev) => prev + 1)
@@ -187,6 +191,13 @@ function Tracking() {
             className="w-full border border-gray-300 rounded-lg pl-9 pr-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           />
         </div>
+        <input
+          type="text"
+          value={bookingNumberFilter}
+          onChange={(e) => setBookingNumberFilter(e.target.value)}
+          placeholder="Filter by Booking No..."
+          className="border border-gray-300 rounded-lg px-3 py-2 text-sm"
+        />
         <select
           value={clientFilter}
           onChange={(e) => setClientFilter(e.target.value)}

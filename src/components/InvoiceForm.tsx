@@ -1,18 +1,22 @@
 import { useEffect, useReducer, useState, type FormEvent } from 'react'
-import { createInvoice, fetchEligibleInvoiceTrucks, type InvoiceLineInput } from '../services/invoiceService'
+import { createInvoice, updateInvoice, fetchEligibleInvoiceTrucks, type InvoiceLineInput } from '../services/invoiceService'
 import { fetchBookings } from '../services/bookingService'
 import type { Booking } from '../types/booking'
-import type { InvoiceType, EligibleInvoiceTruck } from '../types/invoice'
+import type { Invoice, InvoiceType, EligibleInvoiceTruck } from '../types/invoice'
 import { INVOICE_TYPES } from '../constants/invoiceTypes'
 import { Loader2 } from 'lucide-react'
 
 interface InvoiceFormProps {
+  invoice?: Invoice | null
   onSaved: () => void
 }
 
 interface LineState {
   quantity: string
   rate: string
+  percentage: string
+  isFlatAmount: boolean
+  flatAmount: string
   days: string
 }
 
@@ -28,7 +32,8 @@ type TruckAction =
   | { type: 'FETCH_SUCCESS'; payload: EligibleInvoiceTruck[] }
   | { type: 'FETCH_ERROR' }
   | { type: 'TOGGLE_TRUCK'; truckId: string; capacity: string | null; rate: string | null; invoiceType: InvoiceType }
-  | { type: 'UPDATE_LINE'; truckId: string; field: keyof LineState; value: string }
+  | { type: 'UPDATE_LINE'; truckId: string; field: keyof LineState; value: string | boolean }
+  | { type: 'SET_INITIAL'; selectedIds: string[]; lineData: Record<string, LineState>; eligible: EligibleInvoiceTruck[] }
 
 function truckReducer(state: TruckSelectionState, action: TruckAction): TruckSelectionState {
   switch (action.type) {
@@ -38,6 +43,8 @@ function truckReducer(state: TruckSelectionState, action: TruckAction): TruckSel
       return { ...state, eligible: action.payload, loading: false }
     case 'FETCH_ERROR':
       return { ...state, eligible: [], loading: false }
+    case 'SET_INITIAL':
+      return { eligible: action.eligible, loading: false, selectedIds: action.selectedIds, lineData: action.lineData }
     case 'TOGGLE_TRUCK': {
       const isSelected = state.selectedIds.includes(action.truckId)
       const selectedIds = isSelected
@@ -49,6 +56,9 @@ function truckReducer(state: TruckSelectionState, action: TruckAction): TruckSel
         lineData[action.truckId] = {
           quantity: action.invoiceType === 'advance' ? (action.capacity ?? '') : '',
           rate: action.rate ?? '',
+          percentage: '100',
+          isFlatAmount: false,
+          flatAmount: '',
           days: '',
         }
       }
@@ -65,24 +75,27 @@ function truckReducer(state: TruckSelectionState, action: TruckAction): TruckSel
   }
 }
 
-function InvoiceForm({ onSaved }: InvoiceFormProps) {
-  const [invoiceType, setInvoiceType] = useState<InvoiceType>('advance')
-  const [bookingId, setBookingId] = useState('')
-  const [invoiceDate, setInvoiceDate] = useState(new Date().toISOString().slice(0, 10))
-  const [exchangeRate, setExchangeRate] = useState('')
 
-  const [dealNo, setDealNo] = useState('')
-  const [bivacNo, setBivacNo] = useState('')
-  const [modeOfPayment, setModeOfPayment] = useState('Bank')
-  const [deliveryNoteNo, setDeliveryNoteNo] = useState('')
-  const [deliveryNoteDate, setDeliveryNoteDate] = useState('')
-  const [supplierRef, setSupplierRef] = useState('')
-  const [otherRef, setOtherRef] = useState('')
-  const [loadingConNo, setLoadingConNo] = useState('')
-  const [settlementNo, setSettlementNo] = useState('')
-  const [dispatchedThrough, setDispatchedThrough] = useState('')
-  const [destination, setDestination] = useState('')
-  const [termsOfDelivery, setTermsOfDelivery] = useState('')
+function InvoiceForm({ invoice, onSaved }: InvoiceFormProps) {
+  const isEditMode = !!invoice
+
+  const [invoiceType, setInvoiceType] = useState<InvoiceType>(invoice?.invoice_type ?? 'advance')
+  const [bookingId, setBookingId] = useState(invoice?.booking.id.toString() ?? '')
+  const [invoiceDate, setInvoiceDate] = useState(invoice?.invoice_date.slice(0, 10) ?? new Date().toISOString().slice(0, 10))
+  const [exchangeRate, setExchangeRate] = useState(invoice?.exchange_rate ?? '')
+
+  const [dealNo, setDealNo] = useState(invoice?.deal_no ?? '')
+  const [bivacNo, setBivacNo] = useState(invoice?.bivac_no ?? '')
+  const [modeOfPayment, setModeOfPayment] = useState(invoice?.mode_of_payment ?? 'Bank')
+  const [deliveryNoteNo, setDeliveryNoteNo] = useState(invoice?.delivery_note_no ?? '')
+  const [deliveryNoteDate, setDeliveryNoteDate] = useState(invoice?.delivery_note_date?.slice(0, 10) ?? '')
+  const [supplierRef, setSupplierRef] = useState(invoice?.supplier_ref ?? '')
+  const [otherRef, setOtherRef] = useState(invoice?.other_ref ?? '')
+  const [loadingConNo, setLoadingConNo] = useState(invoice?.loading_con_no ?? '')
+  const [settlementNo, setSettlementNo] = useState(invoice?.settlement_no ?? '')
+  const [dispatchedThrough, setDispatchedThrough] = useState(invoice?.dispatched_through ?? '')
+  const [destination, setDestination] = useState(invoice?.destination ?? '')
+  const [termsOfDelivery, setTermsOfDelivery] = useState(invoice?.terms_of_delivery ?? '')
 
   const [bookings, setBookings] = useState<Booking[]>([])
   const [truckState, dispatch] = useReducer(truckReducer, {
@@ -101,7 +114,42 @@ function InvoiceForm({ onSaved }: InvoiceFormProps) {
     fetchBookings().then(setBookings).catch(() => setBookings([]))
   }, [])
 
+  // Edit mode: seed truck selection directly from the invoice's own lines —
+  // no need to fetch "eligible" trucks, since these are already committed.
   useEffect(() => {
+    if (!isEditMode || !invoice) return
+
+    const selectedIds: string[] = []
+    const lineData: Record<string, LineState> = {}
+    const eligible: EligibleInvoiceTruck[] = []
+
+    invoice.lines.forEach((line) => {
+      const btId = line.booking_truck.id.toString()
+      selectedIds.push(btId)
+      lineData[btId] = {
+        quantity: line.quantity ?? '',
+        rate: line.rate ?? '',
+        percentage: '100',
+        isFlatAmount: false,
+        flatAmount: '',
+        days: line.days?.toString() ?? '',
+      }
+      eligible.push({
+        id: line.booking_truck.id,
+        capacity: null,
+        rate: null,
+        truck: line.booking_truck.truck,
+        trailer: line.booking_truck.trailer,
+        trip: line.booking_truck.trip,
+      })
+    })
+
+    dispatch({ type: 'SET_INITIAL', selectedIds, lineData, eligible })
+  }, [isEditMode, invoice])
+
+  // Create mode only: fetch eligible trucks whenever booking/type changes
+  useEffect(() => {
+    if (isEditMode) return
     if (!bookingId) return
 
     let cancelled = false
@@ -118,24 +166,31 @@ function InvoiceForm({ onSaved }: InvoiceFormProps) {
     return () => {
       cancelled = true
     }
-  }, [bookingId, invoiceType])
+  }, [bookingId, invoiceType, isEditMode])
 
   function toggleTruck(truckId: string, capacity: string | null, rate: string | null) {
     dispatch({ type: 'TOGGLE_TRUCK', truckId, capacity, rate, invoiceType })
   }
 
-  function updateLine(truckId: string, field: keyof LineState, value: string) {
+  function updateLine(truckId: string, field: keyof LineState, value: string | boolean) {
     dispatch({ type: 'UPDATE_LINE', truckId, field, value })
   }
 
   function computeAmount(truckId: string): number {
     const line = truckState.lineData[truckId]
     if (!line) return 0
+
+    if (invoiceType === 'advance' && line.isFlatAmount) {
+      return parseFloat(line.flatAmount) || 0
+    }
+
     const quantity = parseFloat(line.quantity) || 0
     const rate = parseFloat(line.rate) || 0
     const days = parseFloat(line.days) || 0
+    const percentage = invoiceType === 'advance' ? (parseFloat(line.percentage) || 100) / 100 : 1
+
     if (invoiceType === 'standing_time') return days * rate
-    return quantity * rate
+    return quantity * rate * percentage
   }
 
   const total = truckState.selectedIds.reduce((sum, id) => sum + computeAmount(id), 0)
@@ -159,36 +214,50 @@ function InvoiceForm({ onSaved }: InvoiceFormProps) {
 
     setIsSubmitting(true)
 
-    const lines: InvoiceLineInput[] = truckState.selectedIds.map((id) => ({
-      booking_truck_id: id,
-      quantity: invoiceType === 'standing_time' ? '0' : truckState.lineData[id]?.quantity || '0',
-      rate: truckState.lineData[id]?.rate || '0',
-      days: invoiceType === 'standing_time' ? truckState.lineData[id]?.days || '0' : undefined,
-    }))
+    const lines: InvoiceLineInput[] = truckState.selectedIds.map((id) => {
+      const line = truckState.lineData[id]
+      return {
+        booking_truck_id: id,
+        quantity: invoiceType === 'standing_time' ? '0' : line?.quantity || '0',
+        rate: line?.rate || '0',
+        percentage: invoiceType === 'advance' && !line?.isFlatAmount ? (line?.percentage || '100') : undefined,
+        is_flat_amount: invoiceType === 'advance' ? !!line?.isFlatAmount : undefined,
+        flat_amount: invoiceType === 'advance' && line?.isFlatAmount ? line?.flatAmount || '0' : undefined,
+        days: invoiceType === 'standing_time' ? line?.days || '0' : undefined,
+      }
+    })
+
+    const sharedPayload = {
+      invoice_date: invoiceDate,
+      exchange_rate: exchangeRate,
+      deal_no: dealNo || undefined,
+      bivac_no: bivacNo || undefined,
+      mode_of_payment: modeOfPayment || undefined,
+      delivery_note_no: deliveryNoteNo || undefined,
+      delivery_note_date: deliveryNoteDate || undefined,
+      supplier_ref: supplierRef || undefined,
+      other_ref: otherRef || undefined,
+      loading_con_no: loadingConNo || undefined,
+      settlement_no: settlementNo || undefined,
+      dispatched_through: dispatchedThrough || undefined,
+      destination: destination || undefined,
+      terms_of_delivery: termsOfDelivery || undefined,
+      lines,
+    }
 
     try {
-      await createInvoice({
-        invoice_type: invoiceType,
-        booking_id: bookingId,
-        invoice_date: invoiceDate,
-        exchange_rate: exchangeRate,
-        deal_no: dealNo || undefined,
-        bivac_no: bivacNo || undefined,
-        mode_of_payment: modeOfPayment || undefined,
-        delivery_note_no: deliveryNoteNo || undefined,
-        delivery_note_date: deliveryNoteDate || undefined,
-        supplier_ref: supplierRef || undefined,
-        other_ref: otherRef || undefined,
-        loading_con_no: loadingConNo || undefined,
-        settlement_no: settlementNo || undefined,
-        dispatched_through: dispatchedThrough || undefined,
-        destination: destination || undefined,
-        terms_of_delivery: termsOfDelivery || undefined,
-        lines,
-      })
+      if (isEditMode && invoice) {
+        await updateInvoice(invoice.id, sharedPayload)
+      } else {
+        await createInvoice({
+          invoice_type: invoiceType,
+          booking_id: bookingId,
+          ...sharedPayload,
+        })
+      }
       onSaved()
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to create invoice')
+      setError(err instanceof Error ? err.message : 'Failed to save invoice')
     } finally {
       setIsSubmitting(false)
     }
@@ -201,19 +270,22 @@ function InvoiceForm({ onSaved }: InvoiceFormProps) {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">Invoice Type</label>
-          <select value={invoiceType} onChange={(e) => setInvoiceType(e.target.value as InvoiceType)}
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm">
+          <select value={invoiceType} onChange={(e) => setInvoiceType(e.target.value as InvoiceType)} disabled={isEditMode}
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm disabled:bg-gray-50">
             {INVOICE_TYPES.map((t) => <option key={t.value} value={t.value}>{t.label}</option>)}
           </select>
         </div>
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">Booking</label>
-          <select value={bookingId} onChange={(e) => setBookingId(e.target.value)}
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm">
+          <select value={bookingId} onChange={(e) => setBookingId(e.target.value)} disabled={isEditMode}
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm disabled:bg-gray-50">
             <option value="">— Select —</option>
             {bookings.map((b) => (
               <option key={b.id} value={b.id}>{b.booking_number} — {b.client.company_name}</option>
             ))}
+            {isEditMode && invoice && (
+              <option value={invoice.booking.id}>{invoice.booking.booking_number} — {invoice.booking.client.company_name}</option>
+            )}
           </select>
         </div>
         <div>
@@ -247,54 +319,88 @@ function InvoiceForm({ onSaved }: InvoiceFormProps) {
       </details>
 
       <h3 className="text-sm font-bold text-gray-600 mb-2">
-        Select Truck(s) — not yet invoiced under {typeConfig.label}
+        {isEditMode ? 'Trucks on this Invoice' : `Select Truck(s) — not yet invoiced under ${typeConfig.label}`}
       </h3>
 
       {truckState.loading && <p className="text-sm text-gray-400 mb-4">Loading eligible trucks...</p>}
-      {!truckState.loading && bookingId && truckState.eligible.length === 0 && (
+      {!isEditMode && !truckState.loading && bookingId && truckState.eligible.length === 0 && (
         <p className="text-sm text-gray-400 mb-4">All trucks in this booking already have a {typeConfig.label} invoice.</p>
       )}
 
       <div className="space-y-2 mb-6">
-        {(bookingId ? truckState.eligible : []).map((bt) => {
+        {truckState.eligible.map((bt) => {
           const truckId = bt.id.toString()
-          const checked = truckState.selectedIds.includes(truckId)
+          const checked = isEditMode || truckState.selectedIds.includes(truckId)
+          const line = truckState.lineData[truckId]
+
           return (
             <div key={bt.id} className="border border-gray-200 rounded-lg overflow-hidden">
-              <label className="flex items-center gap-3 px-3 py-2 text-sm cursor-pointer hover:bg-gray-50">
-                <input type="checkbox" checked={checked} onChange={() => toggleTruck(truckId, bt.capacity, bt.rate)} className="cursor-pointer" />
+              <label className={`flex items-center gap-3 px-3 py-2 text-sm ${isEditMode ? '' : 'cursor-pointer hover:bg-gray-50'}`}>
+                <input type="checkbox" checked={checked} disabled={isEditMode}
+                  onChange={() => toggleTruck(truckId, bt.capacity, bt.rate)} className={isEditMode ? '' : 'cursor-pointer'} />
                 <span className="font-medium text-gray-800">{bt.truck.reg_no}</span>
                 <span className="text-gray-400 text-xs">{bt.trailer?.reg_no ?? 'no trailer'} · {bt.trip?.trip_code ?? '—'}</span>
               </label>
 
-              {checked && (
+              {checked && line && (
                 <div className="bg-gray-50 p-3 border-t border-gray-200">
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                    {invoiceType === 'standing_time' ? (
+                  {invoiceType === 'advance' && (
+                    <label className="flex items-center gap-2 text-xs text-gray-600 mb-2 cursor-pointer">
+                      <input type="checkbox" checked={line.isFlatAmount}
+                        onChange={(e) => updateLine(truckId, 'isFlatAmount', e.target.checked)} className="cursor-pointer" />
+                      Enter a flat agreed amount instead of calculating
+                    </label>
+                  )}
+
+                  {invoiceType === 'advance' && line.isFlatAmount ? (
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                       <div>
-                        <label className="block text-xs text-gray-500 mb-1">Days</label>
-                        <input type="number" value={truckState.lineData[truckId]?.days ?? ''} onChange={(e) => updateLine(truckId, 'days', e.target.value)}
+                        <label className="block text-xs text-gray-500 mb-1">Flat Amount ($)</label>
+                        <input type="number" step="0.01" value={line.flatAmount} onChange={(e) => updateLine(truckId, 'flatAmount', e.target.value)}
                           className="w-full border border-gray-300 rounded-lg px-2 py-1.5 text-sm" />
                       </div>
-                    ) : (
+                      <div className="md:col-span-2 flex items-end">
+                        <div className="bg-blue-50 rounded-lg px-3 py-2 text-sm w-full flex justify-between">
+                          <span className="text-blue-700">Amount</span>
+                          <span className="font-bold text-blue-800">${computeAmount(truckId).toLocaleString()}</span>
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+                      {invoiceType === 'standing_time' ? (
+                        <div>
+                          <label className="block text-xs text-gray-500 mb-1">Days</label>
+                          <input type="number" value={line.days} onChange={(e) => updateLine(truckId, 'days', e.target.value)}
+                            className="w-full border border-gray-300 rounded-lg px-2 py-1.5 text-sm" />
+                        </div>
+                      ) : (
+                        <div>
+                          <label className="block text-xs text-gray-500 mb-1">{typeConfig.quantityLabel}</label>
+                          <input type="number" step="0.001" value={line.quantity} onChange={(e) => updateLine(truckId, 'quantity', e.target.value)}
+                            className="w-full border border-gray-300 rounded-lg px-2 py-1.5 text-sm" />
+                        </div>
+                      )}
                       <div>
-                        <label className="block text-xs text-gray-500 mb-1">{typeConfig.quantityLabel}</label>
-                        <input type="number" step="0.001" value={truckState.lineData[truckId]?.quantity ?? ''} onChange={(e) => updateLine(truckId, 'quantity', e.target.value)}
+                        <label className="block text-xs text-gray-500 mb-1">{typeConfig.rateLabel}</label>
+                        <input type="number" step="0.01" value={line.rate} onChange={(e) => updateLine(truckId, 'rate', e.target.value)}
                           className="w-full border border-gray-300 rounded-lg px-2 py-1.5 text-sm" />
                       </div>
-                    )}
-                    <div>
-                      <label className="block text-xs text-gray-500 mb-1">{typeConfig.rateLabel}</label>
-                      <input type="number" step="0.01" value={truckState.lineData[truckId]?.rate ?? ''} onChange={(e) => updateLine(truckId, 'rate', e.target.value)}
-                        className="w-full border border-gray-300 rounded-lg px-2 py-1.5 text-sm" />
-                    </div>
-                    <div className="flex items-end">
-                      <div className="bg-blue-50 rounded-lg px-3 py-2 text-sm w-full flex justify-between">
-                        <span className="text-blue-700">Amount</span>
-                        <span className="font-bold text-blue-800">${computeAmount(truckId).toLocaleString()}</span>
+                      {invoiceType === 'advance' && (
+                        <div>
+                          <label className="block text-xs text-gray-500 mb-1">Percentage (%)</label>
+                          <input type="number" step="0.01" max="100" value={line.percentage} onChange={(e) => updateLine(truckId, 'percentage', e.target.value)}
+                            className="w-full border border-gray-300 rounded-lg px-2 py-1.5 text-sm" />
+                        </div>
+                      )}
+                      <div className="flex items-end">
+                        <div className="bg-blue-50 rounded-lg px-3 py-2 text-sm w-full flex justify-between">
+                          <span className="text-blue-700">Amount</span>
+                          <span className="font-bold text-blue-800">${computeAmount(truckId).toLocaleString()}</span>
+                        </div>
                       </div>
                     </div>
-                  </div>
+                  )}
                 </div>
               )}
             </div>
@@ -310,7 +416,7 @@ function InvoiceForm({ onSaved }: InvoiceFormProps) {
       <button type="submit" disabled={isSubmitting}
         className="w-full bg-blue-600 text-white py-2.5 rounded-lg font-medium hover:bg-blue-700 transition-colors disabled:opacity-50 flex items-center justify-center gap-2">
         {isSubmitting && <Loader2 size={16} className="animate-spin" />}
-        {isSubmitting ? 'Creating...' : `Create ${typeConfig.label} Invoice`}
+        {isSubmitting ? 'Saving...' : isEditMode ? 'Update Invoice' : `Create ${typeConfig.label} Invoice`}
       </button>
     </form>
   )

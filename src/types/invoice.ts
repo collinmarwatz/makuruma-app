@@ -20,6 +20,10 @@ export interface Invoice {
   invoice_type: InvoiceType
   booking: Booking
   invoice_date: string
+  exchange_rate: string
+  status: 'pending' | 'paid'
+  paid_at: string | null
+  payer: { id: number; name: string } | null
   mode_of_payment: string | null
   delivery_note_no: string | null
   delivery_note_date: string | null

@@ -263,9 +263,9 @@ validRows.forEach((r) => {
             <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
             <select value={category} onChange={(e) => setCategory(e.target.value as ExpenseCategory)}
               className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm">
-              <option value="trip">Trip</option>
+              <option value="trip">Convoy</option>
               <option value="office">Office</option>
-              <option value="truck">Truck</option>
+              <option value="truck">Truck Annual Cost</option>
             </select>
           </div>
 
