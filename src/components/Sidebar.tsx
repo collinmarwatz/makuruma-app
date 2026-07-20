@@ -11,6 +11,8 @@ import { Receipt } from 'lucide-react'
 import { FileText } from 'lucide-react'
 import { Package } from 'lucide-react'
 import { FileBarChart } from 'lucide-react'
+import { Scale } from 'lucide-react'
+
 
 
 const navItems = [
@@ -26,6 +28,7 @@ const navItems = [
   { to: '/expenses', label: 'Expenses', icon: Receipt },
   { to: '/invoices', label: 'Invoices', icon: FileText },
   { to: '/reports', label: 'Reports', icon: FileBarChart },
+  { to: '/reconciliation', label: 'Reconciliation', icon: Scale },
   { to: '/users', label: 'Users', icon: UsersIcon },
 ]
 

@@ -1,5 +1,5 @@
 import { useEffect, useState, type FormEvent } from 'react'
-import { createBooking, updateBooking, fetchEligibleTrucks } from '../services/bookingService'
+import { createBooking, updateBooking, fetchEligibleTrucks, removeTruckFromBooking } from '../services/bookingService'
 import { fetchClients } from '../services/clientService'
 import type { Client } from '../types/partner'
 import type { Booking, EligibleTruck } from '../types/booking'
@@ -29,7 +29,7 @@ function BookingForm({ booking, direction = 'go', onSaved }: BookingFormProps) {
 
   const [clients, setClients] = useState<Client[]>([])
   const [clientId, setClientId] = useState(booking?.client.id.toString() ?? '')
-  const [eta, setEta] = useState(booking?.eta?.slice(0, 10) ?? '') 
+  const [eta, setEta] = useState(booking?.eta?.slice(0, 10) ?? '')
   const [loadingPoint, setLoadingPoint] = useState(booking?.loading_point ?? '')
   const [offloadingPoint, setOffloadingPoint] = useState(booking?.offloading_point ?? '')
   const [description, setDescription] = useState(booking?.description ?? '')
@@ -45,6 +45,9 @@ function BookingForm({ booking, direction = 'go', onSaved }: BookingFormProps) {
     })
     return initial
   })
+
+  const [removingTruckId, setRemovingTruckId] = useState<number | null>(null)
+  const [removeError, setRemoveError] = useState<string | null>(null)
 
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -71,6 +74,22 @@ function BookingForm({ booking, direction = 'go', onSaved }: BookingFormProps) {
 
   function updateTruckLine(truckId: string, field: keyof TruckLineState, value: string) {
     setTruckLines((prev) => ({ ...prev, [truckId]: { ...prev[truckId], [field]: value } }))
+  }
+
+  async function handleRemoveTruck(bookingTruckId: number, regNo: string) {
+    if (!booking) return
+    if (!window.confirm(`Remove ${regNo} from this booking? This frees the truck (e.g. after an accident or complication) but keeps all its expense/invoice history.`)) return
+
+    setRemoveError(null)
+    setRemovingTruckId(bookingTruckId)
+    try {
+      await removeTruckFromBooking(booking.id, bookingTruckId)
+      onSaved()
+    } catch (err) {
+      setRemoveError(err instanceof Error ? err.message : 'Failed to remove truck')
+    } finally {
+      setRemovingTruckId(null)
+    }
   }
 
   async function handleSubmit(e: FormEvent) {
@@ -172,10 +191,13 @@ function BookingForm({ booking, direction = 'go', onSaved }: BookingFormProps) {
         <p className="text-sm text-gray-400 mb-4">No eligible trucks available for a {direction} booking right now.</p>
       )}
 
+      {removeError && <p className="text-sm text-red-600 mb-2">{removeError}</p>}
+
       <div className="space-y-2 mb-6">
         {displayTrucks.map((truck) => {
           const truckId = truck.id.toString()
           const checked = isEditMode || selectedTruckIds.includes(truckId)
+          const bookingTruck = isEditMode ? booking!.booking_trucks.find((bt) => bt.truck.id === truck.id) : null
 
           return (
             <div key={truck.id} className="border border-gray-200 rounded-lg overflow-hidden">
@@ -214,6 +236,17 @@ function BookingForm({ booking, direction = 'go', onSaved }: BookingFormProps) {
                         className="w-full border border-gray-300 rounded-lg px-2 py-1.5 text-sm" />
                     </div>
                   </div>
+
+                  {isEditMode && bookingTruck && (
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveTruck(bookingTruck.id, truck.reg_no)}
+                      disabled={removingTruckId === bookingTruck.id}
+                      className="mt-3 text-xs text-red-600 hover:text-red-700 font-medium disabled:opacity-50"
+                    >
+                      {removingTruckId === bookingTruck.id ? 'Removing...' : `Remove ${truck.reg_no} from this booking`}
+                    </button>
+                  )}
                 </div>
               )}
             </div>
@@ -221,8 +254,11 @@ function BookingForm({ booking, direction = 'go', onSaved }: BookingFormProps) {
         })}
       </div>
 
-      <button type="submit" disabled={isSubmitting}
-        className="w-full bg-blue-600 text-white py-2.5 rounded-lg font-medium hover:bg-blue-700 transition-colors disabled:opacity-50 flex items-center justify-center gap-2">
+      <button
+        type="submit"
+        disabled={isSubmitting || (!isEditMode && direction === 'return' && displayTrucks.length === 0)}
+        className="w-full bg-blue-600 text-white py-2.5 rounded-lg font-medium hover:bg-blue-700 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+      >
         {isSubmitting && <Loader2 size={16} className="animate-spin" />}
         {isSubmitting ? 'Saving...' : isEditMode ? 'Update Booking' : 'Create Booking'}
       </button>

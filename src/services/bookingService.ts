@@ -48,6 +48,9 @@ export async function updateBooking(id: number, data: UpdateBookingData): Promis
 export async function deleteBooking(id: number): Promise<void> {
   return apiClient(`/bookings/${id}`, { method: 'DELETE' })
 }
+export async function removeTruckFromBooking(bookingId: number, bookingTruckId: number): Promise<void> {
+  return apiClient(`/bookings/${bookingId}/trucks/${bookingTruckId}`, { method: 'DELETE' })
+}
 
 export async function downloadBookingAccessList(booking: Booking): Promise<void> {
   const token = localStorage.getItem('auth_token')

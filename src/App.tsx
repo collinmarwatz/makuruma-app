@@ -17,6 +17,7 @@ import Invoices from './pages/Invoices'
 import Assets from './pages/Assets'
 import Trips from './pages/Trips'
 import Reports from './pages/Reports'
+import Reconciliation from './pages/Reconciliation'
 
 
 
@@ -56,6 +57,7 @@ function AppRoutes() {
 <Route path="/invoices" element={<Invoices />} />
 <Route path="/users" element={<Users />} />
 <Route path="/reports" element={<Reports />} />
+<Route path="/reconciliation" element={<Reconciliation />} />
 
       </Route>
     </Routes>
