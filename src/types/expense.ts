@@ -7,6 +7,9 @@ export type Currency = 'TZS' | 'USD' | 'ZMK'
 
 export interface ExpenseLine {
   id: number
+  order_number: string
+  reference_no: string | null
+  category: ExpenseCategory
   line_category: LineCategory
   vendor: { id: number; company_name: string } | null
   booking_truck: { id: number; truck: { reg_no: string }; trip: { trip_code: string } | null } | null
@@ -23,6 +26,7 @@ export interface ExpenseLine {
 export interface ExpenseOrder {
   id: number
   order_number: string
+  reference_no: string | null
   category: ExpenseCategory
   status: ExpenseStatus
   total_amount: string

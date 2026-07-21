@@ -18,6 +18,7 @@ export interface ExpenseLineInput {
 
 export interface CreateExpenseData {
   category: ExpenseCategory
+  reference_no: string
   booking_id?: string
   truck_id?: string
   payment_account?: string
@@ -40,7 +41,7 @@ export async function createExpenseOrder(data: CreateExpenseData): Promise<Expen
 
 export async function updateExpenseOrder(
   id: number,
-  data: { payment_account?: string; initiated_by?: string; payment_date?: string; lines: ExpenseLineInput[] }
+  data: { reference_no: string; payment_account?: string; initiated_by?: string; payment_date?: string; lines: ExpenseLineInput[] }
 ): Promise<ExpenseOrder> {
   return apiClient(`/expense-orders/${id}`, { method: 'PUT', body: JSON.stringify(data) })
 }

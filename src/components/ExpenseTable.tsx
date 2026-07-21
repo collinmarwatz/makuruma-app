@@ -48,6 +48,7 @@ function ExpenseTable({
         <thead className="bg-gray-50 text-left text-gray-500 uppercase text-xs tracking-wide">
           <tr>
             <th className="px-4 py-3">Order Number</th>
+            <th className="px-4 py-3">Reference No.</th>
             <th className="px-4 py-3">Category</th>
             <th className="px-4 py-3">Reference</th>
             <th className="px-4 py-3">Created By</th>
@@ -64,6 +65,7 @@ function ExpenseTable({
           {expenses.map((exp) => (
             <tr key={exp.id} className="hover:bg-gray-50 transition-colors">
               <td className="px-4 py-3 font-medium text-gray-800">{exp.order_number}</td>
+              <td className="px-4 py-3 text-gray-600">{exp.reference_no ?? '—'}</td>
               <td className="px-4 py-3 text-gray-600 capitalize">{exp.category}</td>
               <td className="px-4 py-3 text-gray-600">
                 {exp.booking?.booking_number ?? exp.truck?.reg_no ?? '—'}

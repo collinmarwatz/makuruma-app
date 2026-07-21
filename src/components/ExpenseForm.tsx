@@ -50,6 +50,7 @@ function newRow(category: LineCategory): LineRow {
 function ExpenseForm({ expense, onSaved }: ExpenseFormProps) {
   const isEditMode = !!expense
 
+  const [referenceNo, setReferenceNo] = useState(expense?.reference_no ?? '')
   const [category, setCategory] = useState<ExpenseCategory>(expense?.category ?? 'trip')
   const [bookingId, setBookingId] = useState(expense?.booking?.id.toString() ?? '')
   const [truckId, setTruckId] = useState(expense?.truck?.id.toString() ?? '')
@@ -176,6 +177,10 @@ function ExpenseForm({ expense, onSaved }: ExpenseFormProps) {
     e.preventDefault()
     setError(null)
 
+    if (!referenceNo.trim()) {
+      setError('Enter a unique expense reference number')
+      return
+    }
     if (category === 'trip' && !bookingId) {
       setError('Select a booking for a Trip category expense')
       return
@@ -195,40 +200,41 @@ function ExpenseForm({ expense, onSaved }: ExpenseFormProps) {
 
     const lines: ExpenseLineInput[] = []
 
-validRows.forEach((r) => {
-  const groupKey = crypto.randomUUID()
-  const exchangeRate = r.currency === 'TZS' ? '1' : r.exchangeRate
+    validRows.forEach((r) => {
+      const groupKey = crypto.randomUUID()
+      const exchangeRate = r.currency === 'TZS' ? '1' : r.exchangeRate
 
-  r.selectedTruckIds.forEach((truckId) => {
-    if (r.lineCategory === 'fuel') {
-      lines.push({
-        line_category: r.lineCategory,
-        vendor_id: r.vendorId || undefined,
-        booking_truck_id: truckId,
-        group_key: groupKey,
-        description: r.description,
-        currency: r.currency,
-        exchange_rate: exchangeRate,
-        quantity: r.truckLitres[truckId] || '0',
-        unit_rate: r.unitRate || '0',
+      r.selectedTruckIds.forEach((truckId) => {
+        if (r.lineCategory === 'fuel') {
+          lines.push({
+            line_category: r.lineCategory,
+            vendor_id: r.vendorId || undefined,
+            booking_truck_id: truckId,
+            group_key: groupKey,
+            description: r.description,
+            currency: r.currency,
+            exchange_rate: exchangeRate,
+            quantity: r.truckLitres[truckId] || '0',
+            unit_rate: r.unitRate || '0',
+          })
+        } else {
+          lines.push({
+            line_category: r.lineCategory,
+            booking_truck_id: truckId,
+            group_key: groupKey,
+            description: r.description,
+            currency: r.currency,
+            exchange_rate: exchangeRate,
+            original_amount: r.originalAmount || '0',
+          })
+        }
       })
-    } else {
-      lines.push({
-        line_category: r.lineCategory,
-        booking_truck_id: truckId,
-        group_key: groupKey,
-        description: r.description,
-        currency: r.currency,
-        exchange_rate: exchangeRate,
-        original_amount: r.originalAmount || '0',
-      })
-    }
-  })
-})
+    })
 
     try {
       if (isEditMode && expense) {
         await updateExpenseOrder(expense.id, {
+          reference_no: referenceNo,
           payment_account: paymentAccount || undefined,
           initiated_by: initiatedBy || undefined,
           payment_date: paymentDate || undefined,
@@ -236,6 +242,7 @@ validRows.forEach((r) => {
         })
       } else {
         await createExpenseOrder({
+          reference_no: referenceNo,
           category,
           booking_id: category === 'trip' ? bookingId : undefined,
           truck_id: category === 'truck' ? truckId : undefined,
@@ -257,15 +264,22 @@ validRows.forEach((r) => {
     <form onSubmit={handleSubmit}>
       {error && <div className="bg-red-50 text-red-700 text-sm rounded-lg p-3 mb-4 border border-red-100">{error}</div>}
 
+      <div className="mb-4">
+        <label className="block text-sm font-medium text-gray-700 mb-1">Expense Reference No.</label>
+        <input type="text" value={referenceNo} onChange={(e) => setReferenceNo(e.target.value)}
+          placeholder="e.g. 82" className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" />
+        <p className="text-xs text-gray-400 mt-1">Must be unique across all expense orders.</p>
+      </div>
+
       {!isEditMode && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
             <select value={category} onChange={(e) => setCategory(e.target.value as ExpenseCategory)}
               className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm">
-              <option value="trip">Convoy</option>
+              <option value="trip">Trip</option>
               <option value="office">Office</option>
-              <option value="truck">Truck Annual Cost</option>
+              <option value="truck">Truck</option>
             </select>
           </div>
 
