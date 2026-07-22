@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
+import PasswordInput from '../components/ui/PasswordInput'
 import logo from '../assets/logo.png'
 import bgLogin from '../assets/bg-login.png'
 
@@ -67,12 +68,11 @@ function Login() {
           <label className="block text-sm font-medium text-foreground mb-1">
             Password
           </label>
-          <input
-            type="password"
+          <PasswordInput
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
-            className="w-full bg-secondary ring-1 ring-border rounded-lg px-3 py-2 mb-6 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-brand"
+            className="mb-6"
           />
 
           <button

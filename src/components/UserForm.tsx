@@ -14,7 +14,6 @@ function UserForm({ user, onSaved }: UserFormProps) {
   const [name, setName] = useState(user?.name ?? '')
   const [phone, setPhone] = useState(user?.phone ?? '')
   const [email, setEmail] = useState(user?.email ?? '')
-  const [password, setPassword] = useState('')
   const [roleId, setRoleId] = useState(user?.role?.id?.toString() ?? '')
   const [status, setStatus] = useState<'active' | 'suspended'>(user?.status ?? 'active')
 
@@ -38,13 +37,12 @@ function UserForm({ user, onSaved }: UserFormProps) {
         email,
         role_id: roleId,
         status,
-        ...(password ? { password } : {}),
       }
 
       if (isEditMode) {
         await updateUser(user.id, payload)
       } else {
-        await createUser({ ...payload, password })
+        await createUser(payload)
       }
 
       onSaved()
@@ -85,29 +83,15 @@ function UserForm({ user, onSaved }: UserFormProps) {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-        <div>
-          <label className="block text-sm font-medium text-foreground mb-1">Email</label>
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            className="w-full bg-secondary ring-1 ring-border rounded-lg px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-brand"
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-foreground mb-1">
-            Password {isEditMode && <span className="text-muted-foreground font-normal">(leave blank to keep unchanged)</span>}
-          </label>
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required={!isEditMode}
-            className="w-full bg-secondary ring-1 ring-border rounded-lg px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-brand"
-          />
-        </div>
+      <div className="mb-4">
+        <label className="block text-sm font-medium text-foreground mb-1">Email</label>
+        <input
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+          className="w-full bg-secondary ring-1 ring-border rounded-lg px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-brand"
+        />
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
@@ -136,6 +120,12 @@ function UserForm({ user, onSaved }: UserFormProps) {
           </select>
         </div>
       </div>
+
+      {!isEditMode && (
+        <p className="text-xs text-muted-foreground mb-3">
+          New users are created with the default password <span className="font-medium text-foreground">Makuruma@2026</span> — they should change it after logging in via their Profile page.
+        </p>
+      )}
 
       <button
   type="submit"

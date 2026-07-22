@@ -1,14 +1,18 @@
 import type { UserRecord } from '../types/user'
 import Badge from './ui/Badge'
-import { Pencil, Trash2 } from 'lucide-react'
+import { Pencil, Trash2, KeyRound } from 'lucide-react'
 
 interface UserTableProps {
   users: UserRecord[]
+  currentUserRoleSlug: string | null
   onEdit: (user: UserRecord) => void
   onDelete: (user: UserRecord) => void
+  onResetPassword: (user: UserRecord) => void
 }
 
-function UserTable({ users, onEdit, onDelete }: UserTableProps) {
+function UserTable({ users, currentUserRoleSlug, onEdit, onDelete, onResetPassword }: UserTableProps) {
+  const canResetPassword = currentUserRoleSlug === 'admin'
+
   return (
     <div className="bg-card rounded-xl ring-1 ring-white/5 overflow-x-auto">
       <table className="min-w-full text-sm">
@@ -36,6 +40,15 @@ function UserTable({ users, onEdit, onDelete }: UserTableProps) {
               </td>
               <td className="px-4 py-3">
                 <div className="flex justify-end gap-2">
+                  {canResetPassword && (
+                    <button
+                      onClick={() => onResetPassword(user)}
+                      className="p-1.5 text-muted-foreground hover:text-warn hover:bg-warn/10 rounded-lg transition-colors"
+                      title="Reset password to default"
+                    >
+                      <KeyRound size={16} />
+                    </button>
+                  )}
                   <button
                     onClick={() => onEdit(user)}
                     className="p-1.5 text-muted-foreground hover:text-brand hover:bg-brand/10 rounded-lg transition-colors"

@@ -65,12 +65,24 @@ function Sidebar({ isCollapsed, onToggle }: SidebarProps) {
       </nav>
 
       <div className="mt-auto border-t border-hairline p-3">
-        {!isCollapsed && (
-          <div className="px-2 py-2 mb-1">
-            <p className="truncate text-sm font-medium text-foreground">{user?.name}</p>
-            <p className="truncate text-xs text-muted-foreground">{user?.role?.name ?? 'No role'}</p>
-          </div>
-        )}
+        <NavLink
+          to="/profile"
+          title={isCollapsed ? 'Profile' : undefined}
+          className={({ isActive }) =>
+            `block rounded-md py-2 mb-1 transition-colors ${isCollapsed ? 'px-2 text-center' : 'px-2'} ${
+              isActive ? 'bg-brand/10 ring-1 ring-brand/20' : 'hover:bg-surface'
+            }`
+          }
+        >
+          {!isCollapsed ? (
+            <>
+              <p className="truncate text-sm font-medium text-foreground">{user?.name}</p>
+              <p className="truncate text-xs text-muted-foreground">{user?.role?.name ?? 'No role'}</p>
+            </>
+          ) : (
+            <UserCog size={16} className="mx-auto text-muted-foreground" />
+          )}
+        </NavLink>
         <button
           onClick={logout}
           title={isCollapsed ? 'Log Out' : undefined}

@@ -18,6 +18,7 @@ import Assets from './pages/Assets'
 import Trips from './pages/Trips'
 import Reports from './pages/Reports'
 import Reconciliation from './pages/Reconciliation'
+import Profile from './pages/Profile'
 
 
 
@@ -58,6 +59,7 @@ function AppRoutes() {
 <Route path="/users" element={<Users />} />
 <Route path="/reports" element={<Reports />} />
 <Route path="/reconciliation" element={<Reconciliation />} />
+<Route path="/profile" element={<Profile />} />
 
       </Route>
     </Routes>

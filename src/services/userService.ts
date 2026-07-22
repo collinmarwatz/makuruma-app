@@ -5,7 +5,6 @@ export interface UserFormData {
   name: string
   phone: string
   email: string
-  password?: string
   role_id: string
   status: 'active' | 'suspended'
 }
@@ -31,5 +30,11 @@ export async function updateUser(id: number, data: Partial<UserFormData>): Promi
 export async function deleteUser(id: number): Promise<void> {
   return apiClient(`/users/${id}`, {
     method: 'DELETE',
+  })
+}
+
+export async function resetUserPassword(id: number): Promise<{ message?: string }> {
+  return apiClient(`/users/${id}/reset-password`, {
+    method: 'POST',
   })
 }
