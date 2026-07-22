@@ -29,6 +29,7 @@ interface LineRow {
   exchangeRate: string
   originalAmount: string
   unitRate: string
+  quantity: string
   truckLitres: Record<string, string>
 }
 
@@ -43,6 +44,7 @@ function newRow(category: LineCategory): LineRow {
     exchangeRate: '1',
     originalAmount: '',
     unitRate: '',
+    quantity: '',
     truckLitres: {},
   }
 }
@@ -87,6 +89,7 @@ function ExpenseForm({ expense, onSaved }: ExpenseFormProps) {
         exchangeRate: first.exchange_rate,
         originalAmount: first.original_amount,
         unitRate: first.unit_rate ?? '',
+        quantity: first.quantity ?? '',
         truckLitres,
       }
     })
@@ -107,6 +110,9 @@ function ExpenseForm({ expense, onSaved }: ExpenseFormProps) {
   const fuelVendors = vendors.filter((v) => v.vendor_type === 'fuel')
   const selectedBooking = bookings.find((b) => b.id.toString() === bookingId)
   const bookingTrucks = selectedBooking?.booking_trucks ?? []
+
+  const needsTruckSelection = category === 'trip'
+  const usesQuantityRate = category === 'office'
 
   function addRow(cat: LineCategory) {
     setRows((prev) => [...prev, newRow(cat)])
@@ -158,17 +164,30 @@ function ExpenseForm({ expense, onSaved }: ExpenseFormProps) {
   function computeRowTzsTotal(row: LineRow): number {
     const rate = row.currency === 'TZS' ? 1 : (parseFloat(row.exchangeRate) || 0)
 
-    if (row.lineCategory === 'fuel') {
-      const unitRate = parseFloat(row.unitRate) || 0
-      const totalLitres = row.selectedTruckIds.reduce(
-        (sum, id) => sum + (parseFloat(row.truckLitres[id] ?? '0') || 0),
-        0
-      )
-      return totalLitres * unitRate * rate
+    if (needsTruckSelection) {
+      // Trip category — unchanged: fuel is per-truck litres, others are flat-per-truck × count
+      if (row.lineCategory === 'fuel') {
+        const unitRate = parseFloat(row.unitRate) || 0
+        const totalLitres = row.selectedTruckIds.reduce(
+          (sum, id) => sum + (parseFloat(row.truckLitres[id] ?? '0') || 0),
+          0
+        )
+        return totalLitres * unitRate * rate
+      }
+      const amount = parseFloat(row.originalAmount) || 0
+      return amount * row.selectedTruckIds.length * rate
     }
 
+    if (usesQuantityRate) {
+      // Office category — every line category uses Quantity × Rate
+      const quantity = parseFloat(row.quantity) || 0
+      const unitRate = parseFloat(row.unitRate) || 0
+      return quantity * unitRate * rate
+    }
+
+    // Truck category — a single standalone flat amount, no quantity at all
     const amount = parseFloat(row.originalAmount) || 0
-    return amount * row.selectedTruckIds.length * rate
+    return amount * rate
   }
 
   const total = rows.reduce((sum, r) => sum + computeRowTzsTotal(r), 0)
@@ -190,9 +209,18 @@ function ExpenseForm({ expense, onSaved }: ExpenseFormProps) {
       return
     }
 
-    const validRows = rows.filter((r) => r.description.trim() && r.selectedTruckIds.length > 0)
+    const validRows = rows.filter((r) => {
+      if (!r.description.trim()) return false
+      if (needsTruckSelection) return r.selectedTruckIds.length > 0
+      return true
+    })
+
     if (validRows.length === 0) {
-      setError('Add at least one expense line with a description and at least one truck selected')
+      setError(
+        needsTruckSelection
+          ? 'Add at least one expense line with a description and at least one truck selected'
+          : 'Add at least one expense line with a description'
+      )
       return
     }
 
@@ -204,30 +232,60 @@ function ExpenseForm({ expense, onSaved }: ExpenseFormProps) {
       const groupKey = crypto.randomUUID()
       const exchangeRate = r.currency === 'TZS' ? '1' : r.exchangeRate
 
-      r.selectedTruckIds.forEach((truckId) => {
-        if (r.lineCategory === 'fuel') {
-          lines.push({
-            line_category: r.lineCategory,
-            vendor_id: r.vendorId || undefined,
-            booking_truck_id: truckId,
-            group_key: groupKey,
-            description: r.description,
-            currency: r.currency,
-            exchange_rate: exchangeRate,
-            quantity: r.truckLitres[truckId] || '0',
-            unit_rate: r.unitRate || '0',
-          })
-        } else {
-          lines.push({
-            line_category: r.lineCategory,
-            booking_truck_id: truckId,
-            group_key: groupKey,
-            description: r.description,
-            currency: r.currency,
-            exchange_rate: exchangeRate,
-            original_amount: r.originalAmount || '0',
-          })
-        }
+      if (needsTruckSelection) {
+        // Trip category — expand across every selected truck (unchanged)
+        r.selectedTruckIds.forEach((truckId) => {
+          if (r.lineCategory === 'fuel') {
+            lines.push({
+              line_category: r.lineCategory,
+              vendor_id: r.vendorId || undefined,
+              booking_truck_id: truckId,
+              group_key: groupKey,
+              description: r.description,
+              currency: r.currency,
+              exchange_rate: exchangeRate,
+              quantity: r.truckLitres[truckId] || '0',
+              unit_rate: r.unitRate || '0',
+            })
+          } else {
+            lines.push({
+              line_category: r.lineCategory,
+              booking_truck_id: truckId,
+              group_key: groupKey,
+              description: r.description,
+              currency: r.currency,
+              exchange_rate: exchangeRate,
+              original_amount: r.originalAmount || '0',
+            })
+          }
+        })
+        return
+      }
+
+      if (usesQuantityRate) {
+        // Office category — quantity × rate, same for every line category
+        lines.push({
+          line_category: r.lineCategory,
+          vendor_id: r.vendorId || undefined,
+          group_key: groupKey,
+          description: r.description,
+          currency: r.currency,
+          exchange_rate: exchangeRate,
+          quantity: r.quantity || '0',
+          unit_rate: r.unitRate || '0',
+        })
+        return
+      }
+
+      // Truck category — one flat standalone amount
+      lines.push({
+        line_category: r.lineCategory,
+        vendor_id: r.vendorId || undefined,
+        group_key: groupKey,
+        description: r.description,
+        currency: r.currency,
+        exchange_rate: exchangeRate,
+        original_amount: r.originalAmount || '0',
       })
     })
 
@@ -313,12 +371,12 @@ function ExpenseForm({ expense, onSaved }: ExpenseFormProps) {
         <div>
           <label className="block text-sm font-medium text-foreground mb-1">Payment Account</label>
           <input type="text" value={paymentAccount} onChange={(e) => setPaymentAccount(e.target.value)}
-            placeholder="e.g. CRDB - 0123456" className="w-full bg-secondary ring-1 ring-border rounded-lg px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground" />
+            placeholder="e.g. CRDB - 0123456" className="w-full bg-secondary ring-1 ring-border rounded-lg px-3 py-2 text-sm text-foreground" />
         </div>
         <div>
           <label className="block text-sm font-medium text-foreground mb-1">Initiated By</label>
           <input type="text" value={initiatedBy} onChange={(e) => setInitiatedBy(e.target.value)}
-            placeholder="Name of person" className="w-full bg-secondary ring-1 ring-border rounded-lg px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground" />
+            placeholder="Name of person" className="w-full bg-secondary ring-1 ring-border rounded-lg px-3 py-2 text-sm text-foreground" />
         </div>
         <div>
           <label className="block text-sm font-medium text-foreground mb-1">Payment Date</label>
@@ -328,11 +386,10 @@ function ExpenseForm({ expense, onSaved }: ExpenseFormProps) {
       </div>
 
       {category === 'trip' && bookingId && bookingTrucks.length === 0 && (
-        <p className="text-xs text-warn bg-warn/10 ring-1 ring-warn/20 rounded-lg p-2 mb-4">This booking has no trucks assigned yet.</p>
+        <p className="text-xs text-warn bg-warn/10 rounded-lg p-2 mb-4 ring-1 ring-warn/20">This booking has no trucks assigned yet.</p>
       )}
 
-      {LINE_CATEGORIES.map((cat) => {
-        const catRows = rows.filter((r) => r.lineCategory === cat.value)
+      {LINE_CATEGORIES.filter((cat) => category === 'trip' || cat.value === 'mengine').map((cat) => {        const catRows = rows.filter((r) => r.lineCategory === cat.value)
         return (
           <div key={cat.value} className="mb-6">
             <div className="flex items-center justify-between mb-2">
@@ -381,54 +438,80 @@ function ExpenseForm({ expense, onSaved }: ExpenseFormProps) {
                       </div>
                     )}
 
-                    {row.lineCategory === 'fuel' ? (
+                    {/* Amount / rate section — differs by category */}
+                    {needsTruckSelection && row.lineCategory === 'fuel' && (
                       <div className="mb-2 w-40">
                         <label className="block text-xs text-muted-foreground mb-1">Rate (per litre)</label>
                         <input type="number" step="0.01" value={row.unitRate} onChange={(e) => updateRow(row.key, 'unitRate', e.target.value)}
                           className="w-full bg-secondary ring-1 ring-border rounded-lg px-2 py-1.5 text-sm text-foreground" />
                       </div>
-                    ) : (
+                    )}
+                    {needsTruckSelection && row.lineCategory !== 'fuel' && (
                       <div className="mb-2 w-40">
                         <label className="block text-xs text-muted-foreground mb-1">Amount (per truck)</label>
                         <input type="number" step="0.01" value={row.originalAmount} onChange={(e) => updateRow(row.key, 'originalAmount', e.target.value)}
                           className="w-full bg-secondary ring-1 ring-border rounded-lg px-2 py-1.5 text-sm text-foreground" />
                       </div>
                     )}
-
-                    <div className="flex items-center justify-between mb-1">
-                      <label className="block text-xs text-muted-foreground">Applies To ({row.selectedTruckIds.length} selected)</label>
-                      <div className="flex gap-2">
-                        <button type="button" onClick={() => selectAllTrucksForRow(row.key)} className="text-xs text-brand hover:opacity-80">Select All</button>
-                        <button type="button" onClick={() => clearTrucksForRow(row.key)} className="text-xs text-muted-foreground hover:text-foreground">Clear</button>
+                    {usesQuantityRate && (
+                      <div className="grid grid-cols-2 gap-2 mb-2 w-80">
+                        <div>
+                          <label className="block text-xs text-muted-foreground mb-1">Quantity</label>
+                          <input type="number" step="0.01" value={row.quantity} onChange={(e) => updateRow(row.key, 'quantity', e.target.value)}
+                            className="w-full bg-secondary ring-1 ring-border rounded-lg px-2 py-1.5 text-sm text-foreground" />
+                        </div>
+                        <div>
+                          <label className="block text-xs text-muted-foreground mb-1">Rate</label>
+                          <input type="number" step="0.01" value={row.unitRate} onChange={(e) => updateRow(row.key, 'unitRate', e.target.value)}
+                            className="w-full bg-secondary ring-1 ring-border rounded-lg px-2 py-1.5 text-sm text-foreground" />
+                        </div>
                       </div>
-                    </div>
-                    <div className="ring-1 ring-border rounded-lg divide-y divide-hairline max-h-36 overflow-y-auto bg-card">
-                      {bookingTrucks.map((bt) => {
-                        const btId = bt.id.toString()
-                        const checked = row.selectedTruckIds.includes(btId)
-                        return (
-                          <div key={bt.id} className="px-2 py-1.5">
-                            <label className="flex items-center gap-2 text-sm cursor-pointer">
-                              <input type="checkbox" checked={checked} onChange={() => toggleRowTruck(row.key, btId)} className="cursor-pointer" />
-                              <span className="font-medium text-foreground">{bt.truck.reg_no}</span>
-                            </label>
-                            {checked && row.lineCategory === 'fuel' && (
-                              <div className="ml-6 mt-1">
-                                <input type="number" step="0.01" value={row.truckLitres[btId] ?? ''}
-                                  onChange={(e) => updateLitres(row.key, btId, e.target.value)}
-                                  placeholder="Litres" className="w-32 bg-secondary ring-1 ring-border rounded-lg px-2 py-1 text-xs text-foreground" />
-                              </div>
-                            )}
+                    )}
+                    {!needsTruckSelection && !usesQuantityRate && (
+                      <div className="mb-2 w-40">
+                        <label className="block text-xs text-muted-foreground mb-1">Amount (TZS)</label>
+                        <input type="number" step="0.01" value={row.originalAmount} onChange={(e) => updateRow(row.key, 'originalAmount', e.target.value)}
+                          className="w-full bg-secondary ring-1 ring-border rounded-lg px-2 py-1.5 text-sm text-foreground" />
+                      </div>
+                    )}
+
+                    {needsTruckSelection && (
+                      <>
+                        <div className="flex items-center justify-between mb-1">
+                          <label className="block text-xs text-muted-foreground">Applies To ({row.selectedTruckIds.length} selected)</label>
+                          <div className="flex gap-2">
+                            <button type="button" onClick={() => selectAllTrucksForRow(row.key)} className="text-xs text-brand hover:opacity-80">Select All</button>
+                            <button type="button" onClick={() => clearTrucksForRow(row.key)} className="text-xs text-muted-foreground hover:text-foreground">Clear</button>
                           </div>
-                        )
-                      })}
-                    </div>
+                        </div>
+                        <div className="ring-1 ring-border rounded-lg divide-y divide-hairline max-h-36 overflow-y-auto bg-secondary">
+                          {bookingTrucks.map((bt) => {
+                            const btId = bt.id.toString()
+                            const checked = row.selectedTruckIds.includes(btId)
+                            return (
+                              <div key={bt.id} className="px-2 py-1.5">
+                                <label className="flex items-center gap-2 text-sm cursor-pointer">
+                                  <input type="checkbox" checked={checked} onChange={() => toggleRowTruck(row.key, btId)} className="cursor-pointer" />
+                                  <span className="font-medium text-foreground">{bt.truck.reg_no}</span>
+                                </label>
+                                {checked && row.lineCategory === 'fuel' && (
+                                  <div className="ml-6 mt-1">
+                                    <input type="number" step="0.01" value={row.truckLitres[btId] ?? ''}
+                                      onChange={(e) => updateLitres(row.key, btId, e.target.value)}
+                                      placeholder="Litres" className="w-32 bg-card ring-1 ring-border rounded-lg px-2 py-1 text-xs text-foreground" />
+                                  </div>
+                                )}
+                              </div>
+                            )
+                          })}
+                        </div>
+                      </>
+                    )}
 
-                    <div className="mt-2 text-right text-xs text-muted-foreground">
-                      Line total: <span className="font-semibold text-foreground">TZS {computeRowTzsTotal(row).toLocaleString()}</span>
-                    </div>
-
-                    <div className="flex justify-end mt-1">
+                    <div className="mt-2 flex items-center justify-between">
+                      <p className="text-xs text-muted-foreground">
+                        Line total: <span className="font-semibold text-foreground">TZS {computeRowTzsTotal(row).toLocaleString()}</span>
+                      </p>
                       <button type="button" onClick={() => removeRow(row.key)} className="p-1.5 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-lg transition-colors">
                         <Trash2 size={14} />
                       </button>
@@ -441,9 +524,9 @@ function ExpenseForm({ expense, onSaved }: ExpenseFormProps) {
         )
       })}
 
-      <div className="bg-surface rounded-lg p-3 mb-6 flex justify-between items-center ring-1 ring-white/5">
+      <div className="bg-surface-2 rounded-lg p-3 mb-6 flex justify-between items-center ring-1 ring-white/5">
         <span className="text-sm font-medium text-muted-foreground">Total (TZS)</span>
-        <span className="text-lg font-semibold text-foreground">TZS {total.toLocaleString()}</span>
+        <span className="text-lg font-bold text-foreground">TZS {total.toLocaleString()}</span>
       </div>
 
       <button type="submit" disabled={isSubmitting}
