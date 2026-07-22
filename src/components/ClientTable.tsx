@@ -11,9 +11,9 @@ interface ClientTableProps {
 
 function ClientTable({ clients, onEdit, onDelete }: ClientTableProps) {
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-x-auto">
+    <div className="bg-card rounded-xl ring-1 ring-white/5 overflow-x-auto">
       <table className="min-w-full text-sm">
-        <thead className="bg-gray-50 text-left text-gray-500 uppercase text-xs tracking-wide">
+        <thead className="bg-surface-2 text-left text-muted-foreground uppercase text-xs tracking-wider">
           <tr>
             <th className="px-4 py-3">Company Name</th>
             <th className="px-4 py-3">Email</th>
@@ -22,21 +22,21 @@ function ClientTable({ clients, onEdit, onDelete }: ClientTableProps) {
             <th className="px-4 py-3 text-right">Actions</th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-gray-100">
+        <tbody className="divide-y divide-hairline">
           {clients.map((client) => (
-            <tr key={client.id} className="hover:bg-gray-50 transition-colors">
-              <td className="px-4 py-3 font-medium text-gray-800">{client.company_name}</td>
-              <td className="px-4 py-3 text-gray-600">{client.email ?? '—'}</td>
-              <td className="px-4 py-3 text-gray-600">{client.phone ?? '—'}</td>
+            <tr key={client.id} className="hover:bg-surface transition-colors">
+              <td className="px-4 py-3 font-medium text-foreground">{client.company_name}</td>
+              <td className="px-4 py-3 text-muted-foreground">{client.email ?? '—'}</td>
+              <td className="px-4 py-3 text-muted-foreground">{client.phone ?? '—'}</td>
               <td className="px-4 py-3">
   <Badge label={client.allows_advance_invoice ? 'Allowed' : 'Not Allowed'} color={client.allows_advance_invoice ? 'green' : 'gray'} />
 </td>
               <td className="px-4 py-3">
                 <div className="flex justify-end gap-2">
-                  <button onClick={() => onEdit(client)} className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors" title="Edit client">
+                  <button onClick={() => onEdit(client)} className="p-1.5 text-muted-foreground hover:text-brand hover:bg-brand/10 rounded-lg transition-colors" title="Edit client">
                     <Pencil size={16} />
                   </button>
-                  <button onClick={() => onDelete(client)} className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors" title="Delete client">
+                  <button onClick={() => onDelete(client)} className="p-1.5 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-lg transition-colors" title="Delete client">
                     <Trash2 size={16} />
                   </button>
                 </div>
@@ -47,7 +47,7 @@ function ClientTable({ clients, onEdit, onDelete }: ClientTableProps) {
       </table>
 
       {clients.length === 0 && (
-        <div className="text-center py-12 text-gray-400 text-sm">No clients added yet. Click "Add Client" to get started.</div>
+        <div className="text-center py-12 text-muted-foreground text-sm">No clients added yet. Click "Add Client" to get started.</div>
       )}
     </div>
   )

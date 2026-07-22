@@ -89,26 +89,26 @@ function Invoices() {
     }
   }
 
-  if (error) return <p className="p-8 text-red-500">Error: {error}</p>
+  if (error) return <p className="p-8 text-destructive">Error: {error}</p>
 
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
+    <div className="min-h-screen bg-background p-8">
       <div className="flex items-center justify-between mb-4">
-        <h1 className="text-2xl font-bold text-gray-800">Invoices</h1>
-        <button onClick={openAddModal} className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2.5 rounded-lg font-medium hover:bg-blue-700 transition-colors">
+        <h1 className="text-2xl font-semibold tracking-tight text-foreground">Invoices</h1>
+        <button onClick={openAddModal} className="flex items-center gap-2 bg-brand text-brand-foreground px-4 py-2.5 rounded-lg font-medium hover:opacity-90 transition-opacity">
           <Plus size={18} />
           New Invoice
         </button>
       </div>
 
       <div className="relative mb-6 max-w-sm">
-        <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+        <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
         <input
           type="text"
           value={bookingSearch}
           onChange={(e) => setBookingSearch(e.target.value)}
           placeholder="Search by Booking Number..."
-          className="w-full border border-gray-300 rounded-lg pl-9 pr-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          className="w-full bg-secondary ring-1 ring-border rounded-lg pl-9 pr-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-brand"
         />
       </div>
 

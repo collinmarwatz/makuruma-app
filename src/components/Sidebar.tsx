@@ -1,25 +1,20 @@
 import { NavLink } from 'react-router-dom'
-import { LayoutDashboard, Users as UsersIcon, LogOut, ChevronLeft, ChevronRight } from 'lucide-react'
+import {
+  LayoutDashboard, ClipboardList, Route as RouteIcon, MapPin, Package,
+  UserCog, IdCard, Building2, Store, Receipt, FileText, BarChart3, Scale,
+  Users as UsersIcon, LogOut, ChevronLeft, ChevronRight,
+} from 'lucide-react'
 import { useAuth } from '../hooks/useAuth'
-import { UserCog, IdCard } from 'lucide-react'
-import { Building2, Store } from 'lucide-react'
-import { ClipboardList } from 'lucide-react'
 import logo from '../assets/logo.png'
-import { Route as RouteIcon } from 'lucide-react'
-import { MapPin } from 'lucide-react'
-import { Receipt } from 'lucide-react'
-import { FileText } from 'lucide-react'
-import { Package } from 'lucide-react'
-import { FileBarChart } from 'lucide-react'
-import { Scale } from 'lucide-react'
 
-
-
-const navItems = [
+const primaryNavItems = [
   { to: '/', label: 'Dashboard', icon: LayoutDashboard },
   { to: '/bookings', label: 'Bookings', icon: ClipboardList },
   { to: '/trips', label: 'Trips', icon: RouteIcon },
   { to: '/tracking', label: 'Tracking', icon: MapPin },
+]
+
+const secondaryNavItems = [
   { to: '/assets', label: 'Assets', icon: Package },
   { to: '/staff', label: 'Staff', icon: UserCog },
   { to: '/drivers', label: 'Drivers', icon: IdCard },
@@ -27,11 +22,10 @@ const navItems = [
   { to: '/vendors', label: 'Vendors', icon: Store },
   { to: '/expenses', label: 'Expenses', icon: Receipt },
   { to: '/invoices', label: 'Invoices', icon: FileText },
-  { to: '/reports', label: 'Reports', icon: FileBarChart },
   { to: '/reconciliation', label: 'Reconciliation', icon: Scale },
+  { to: '/reports', label: 'Reports', icon: BarChart3 },
   { to: '/users', label: 'Users', icon: UsersIcon },
 ]
-
 
 interface SidebarProps {
   isCollapsed: boolean
@@ -43,65 +37,82 @@ function Sidebar({ isCollapsed, onToggle }: SidebarProps) {
 
   return (
     <aside
-      className={`min-h-screen bg-white border-r border-gray-100 flex flex-col transition-all duration-200 ${
+      className={`sticky top-0 flex h-screen shrink-0 flex-col border-r border-hairline bg-background transition-all duration-200 ${
         isCollapsed ? 'w-20' : 'w-64'
       }`}
     >
-      <div className={`px-4 py-5 border-b border-gray-100 flex items-center ${isCollapsed ? 'justify-center' : 'justify-between'}`}>
-  {!isCollapsed && (
-    <img src={logo} alt="Makuruma Logistics" className="h-8" />
-  )}
-  <button
-    onClick={onToggle}
-    className="p-1.5 text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors flex-shrink-0"
-    title={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-  >
-    {isCollapsed ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
-  </button>
-</div>
+      <div className={`flex h-20 items-center border-b border-hairline px-4 ${isCollapsed ? 'justify-center' : 'justify-between'}`}>
+        {!isCollapsed && <img src={logo} alt="Makuruma Logistics" className="h-9 w-auto" />}
+        <button
+          onClick={onToggle}
+          className="grid size-8 shrink-0 place-items-center rounded-md text-muted-foreground transition-colors hover:bg-surface hover:text-foreground"
+          title={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+        >
+          {isCollapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
+        </button>
+      </div>
 
-      <nav className="flex-1 px-3 py-4 space-y-1">
-        {navItems.map(({ to, label, icon: Icon }) => (
-          <NavLink
-            key={to}
-            to={to}
-            end={to === '/'}
-            title={isCollapsed ? label : undefined}
-            className={({ isActive }) =>
-              `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
-                isCollapsed ? 'justify-center' : ''
-              } ${
-                isActive
-  ? 'bg-teal-50 text-teal-700'
-  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-              }`
-            }
-          >
-            <Icon size={18} className="flex-shrink-0" />
-            {!isCollapsed && label}
-          </NavLink>
+      <nav className="flex-1 space-y-0.5 overflow-y-auto px-3 py-4">
+        {primaryNavItems.map((item) => (
+          <SidebarLink key={item.to} item={item} isCollapsed={isCollapsed} />
+        ))}
+
+        <div className="my-4 h-px bg-hairline/60" />
+
+        {secondaryNavItems.map((item) => (
+          <SidebarLink key={item.to} item={item} isCollapsed={isCollapsed} />
         ))}
       </nav>
 
-      <div className="px-3 py-4 border-t border-gray-100">
+      <div className="mt-auto border-t border-hairline p-3">
         {!isCollapsed && (
-          <div className="px-3 py-2 mb-2">
-            <p className="text-sm font-medium text-gray-800 truncate">{user?.name}</p>
-            <p className="text-xs text-gray-400 truncate">{user?.role?.name ?? 'No role'}</p>
+          <div className="px-2 py-2 mb-1">
+            <p className="truncate text-sm font-medium text-foreground">{user?.name}</p>
+            <p className="truncate text-xs text-muted-foreground">{user?.role?.name ?? 'No role'}</p>
           </div>
         )}
         <button
           onClick={logout}
           title={isCollapsed ? 'Log Out' : undefined}
-          className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-gray-600 hover:bg-red-50 hover:text-red-600 transition-colors ${
-            isCollapsed ? 'justify-center' : ''
+          className={`flex w-full items-center gap-3 rounded-md py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive ${
+            isCollapsed ? 'justify-center px-2' : 'px-2'
           }`}
         >
-          <LogOut size={18} className="flex-shrink-0" />
+          <LogOut size={16} className="shrink-0" />
           {!isCollapsed && 'Log Out'}
         </button>
       </div>
     </aside>
+  )
+}
+
+function SidebarLink({
+  item,
+  isCollapsed,
+}: {
+  item: { to: string; label: string; icon: typeof LayoutDashboard }
+  isCollapsed: boolean
+}) {
+  const Icon = item.icon
+
+  return (
+    <NavLink
+      to={item.to}
+      end={item.to === '/'}
+      title={isCollapsed ? item.label : undefined}
+      className={({ isActive }) =>
+        `flex items-center gap-3 rounded-md py-2 text-sm font-medium transition-colors ${
+          isCollapsed ? 'justify-center px-2' : 'pl-2 pr-3'
+        } ${
+          isActive
+            ? 'bg-brand/10 text-brand ring-1 ring-brand/20'
+            : 'text-muted-foreground hover:bg-surface hover:text-foreground'
+        }`
+      }
+    >
+      <Icon size={16} className="shrink-0" />
+      {!isCollapsed && item.label}
+    </NavLink>
   )
 }
 

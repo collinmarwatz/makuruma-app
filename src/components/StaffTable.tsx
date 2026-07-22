@@ -9,9 +9,9 @@ interface StaffTableProps {
 
 function StaffTable({ staff, onEdit, onDelete }: StaffTableProps) {
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-x-auto">
+    <div className="bg-card rounded-xl ring-1 ring-white/5 overflow-x-auto">
       <table className="min-w-full text-sm">
-        <thead className="bg-gray-50 text-left text-gray-500 uppercase text-xs tracking-wide">
+        <thead className="bg-surface-2 text-left text-muted-foreground uppercase text-xs tracking-wider">
           <tr>
             <th className="px-4 py-3">Full Name</th>
             <th className="px-4 py-3">Phone Number</th>
@@ -21,26 +21,26 @@ function StaffTable({ staff, onEdit, onDelete }: StaffTableProps) {
             <th className="px-4 py-3 text-right">Actions</th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-gray-100">
+        <tbody className="divide-y divide-hairline">
           {staff.map((member) => (
-            <tr key={member.id} className="hover:bg-gray-50 transition-colors">
-              <td className="px-4 py-3 font-medium text-gray-800">{member.full_name}</td>
-              <td className="px-4 py-3 text-gray-600">{member.phone ?? '—'}</td>
-              <td className="px-4 py-3 text-gray-600">{member.tin_number ?? '—'}</td>
-              <td className="px-4 py-3 text-gray-600">{member.payment_account ?? '—'}</td>
+            <tr key={member.id} className="hover:bg-surface transition-colors">
+              <td className="px-4 py-3 font-medium text-foreground">{member.full_name}</td>
+              <td className="px-4 py-3 text-muted-foreground">{member.phone ?? '—'}</td>
+              <td className="px-4 py-3 text-muted-foreground">{member.tin_number ?? '—'}</td>
+              <td className="px-4 py-3 text-muted-foreground">{member.payment_account ?? '—'}</td>
               <td className="px-4 py-3">
                 {member.documents.length > 0 ? (
-                  <Paperclip size={16} className="text-gray-400" />
+                  <Paperclip size={16} className="text-muted-foreground" />
                 ) : (
-                  <span className="text-gray-300">—</span>
+                  <span className="text-muted-foreground/50">—</span>
                 )}
               </td>
               <td className="px-4 py-3">
                 <div className="flex justify-end gap-2">
-                  <button onClick={() => onEdit(member)} className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors" title="Edit staff">
+                  <button onClick={() => onEdit(member)} className="p-1.5 text-muted-foreground hover:text-brand hover:bg-brand/10 rounded-lg transition-colors" title="Edit staff">
                     <Pencil size={16} />
                   </button>
-                  <button onClick={() => onDelete(member)} className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors" title="Delete staff">
+                  <button onClick={() => onDelete(member)} className="p-1.5 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-lg transition-colors" title="Delete staff">
                     <Trash2 size={16} />
                   </button>
                 </div>
@@ -51,7 +51,7 @@ function StaffTable({ staff, onEdit, onDelete }: StaffTableProps) {
       </table>
 
       {staff.length === 0 && (
-        <div className="text-center py-12 text-gray-400 text-sm">No staff added yet. Click "Add Staff" to get started.</div>
+        <div className="text-center py-12 text-muted-foreground text-sm">No staff added yet. Click "Add Staff" to get started.</div>
       )}
     </div>
   )

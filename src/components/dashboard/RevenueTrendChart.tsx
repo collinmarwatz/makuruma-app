@@ -12,7 +12,7 @@ function formatMonth(monthStr: string): string {
 
 function RevenueTrendChart({ data }: RevenueTrendChartProps) {
   if (data.length === 0) {
-    return <p className="text-sm text-gray-400 text-center py-12">No invoices yet.</p>
+    return <p className="text-sm text-muted-foreground text-center py-12">No invoices yet.</p>
   }
 
   const chartData = data.map((d) => ({
@@ -23,11 +23,16 @@ function RevenueTrendChart({ data }: RevenueTrendChartProps) {
   return (
     <ResponsiveContainer width="100%" height={220}>
       <BarChart data={chartData}>
-        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f3f4f6" />
-        <XAxis dataKey="month" tick={{ fontSize: 12 }} />
-        <YAxis tick={{ fontSize: 12 }} tickFormatter={(v) => `$${v / 1000}k`} />
-        <Tooltip formatter={(value) => `$${Number(value).toLocaleString()}`} />
-        <Bar dataKey="total" fill="#0d9488" radius={[4, 4, 0, 0]} />
+        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#262629" />
+        <XAxis dataKey="month" tick={{ fontSize: 12, fill: '#97989d' }} />
+        <YAxis tick={{ fontSize: 12, fill: '#97989d' }} tickFormatter={(v) => `$${v / 1000}k`} />
+        <Tooltip
+          formatter={(value) => `$${Number(value).toLocaleString()}`}
+          contentStyle={{ background: '#171719', border: '1px solid #262629', borderRadius: 8, color: '#f1f1f4' }}
+          labelStyle={{ color: '#f1f1f4' }}
+          cursor={{ fill: '#262629' }}
+        />
+        <Bar dataKey="total" fill="#2a7f88" radius={[4, 4, 0, 0]} />
       </BarChart>
     </ResponsiveContainer>
   )

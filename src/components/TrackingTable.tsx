@@ -11,9 +11,9 @@ interface TrackingTableProps {
 
 function TrackingTable({ trucks, onView, onDownload }: TrackingTableProps) {
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-x-auto">
+    <div className="bg-card rounded-xl ring-1 ring-white/5 overflow-x-auto">
       <table className="min-w-full text-sm">
-        <thead className="bg-gray-50 text-left text-gray-500 uppercase text-xs tracking-wide">
+        <thead className="bg-surface-2 text-left text-muted-foreground uppercase text-xs tracking-wider">
           <tr>
             <th className="px-4 py-3">Truck Number</th>
             <th className="px-4 py-3">Trailer</th>
@@ -31,41 +31,41 @@ function TrackingTable({ trucks, onView, onDownload }: TrackingTableProps) {
             <th className="px-4 py-3 text-right">Actions</th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-gray-100">
+        <tbody className="divide-y divide-hairline">
           {trucks.map((truck) => {
             const statusLabel = TRACKING_STATUS_OPTIONS.find((o) => o.value === truck.current_status)?.label ?? truck.current_status
             const recentBooking = truck.booking_trucks?.[0] ?? null
 
             return (
-              <tr key={truck.id} className="hover:bg-gray-50 transition-colors">
-                <td className="px-4 py-3 font-medium text-gray-800">{truck.reg_no}</td>
-                <td className="px-4 py-3 text-gray-600">{truck.trailer?.reg_no ?? '—'}</td>
-                <td className="px-4 py-3 text-gray-600">{truck.driver?.full_name ?? '—'}</td>
-                <td className="px-4 py-3 text-gray-600">{truck.driver?.phone ?? '—'}</td>
-                <td className="px-4 py-3 text-gray-600">{truck.current_location ?? '—'}</td>
+              <tr key={truck.id} className="hover:bg-surface transition-colors">
+                <td className="px-4 py-3 font-medium text-foreground">{truck.reg_no}</td>
+                <td className="px-4 py-3 text-muted-foreground">{truck.trailer?.reg_no ?? '—'}</td>
+                <td className="px-4 py-3 text-muted-foreground">{truck.driver?.full_name ?? '—'}</td>
+                <td className="px-4 py-3 text-muted-foreground">{truck.driver?.phone ?? '—'}</td>
+                <td className="px-4 py-3 text-muted-foreground">{truck.current_location ?? '—'}</td>
                 <td className="px-4 py-3">
                   <div className="flex items-center gap-1.5">
                     <Badge label={statusLabel} color={TRACKING_STATUS_COLORS[truck.current_status]} />
                     {recentBooking?.is_overdue && (
                       <span title="Past ETA, not yet completed">
-                        <AlertTriangle size={14} className="text-red-500" />
+                        <AlertTriangle size={14} className="text-destructive" />
                       </span>
                     )}
                   </div>
                 </td>
-                <td className="px-4 py-3 text-gray-600">{recentBooking?.booking.loading_point ?? '—'}</td>
-                <td className="px-4 py-3 text-gray-600">{recentBooking?.loading_point_arrival_date?.slice(0, 10) ?? '—'}</td>
-                <td className="px-4 py-3 text-gray-600">{recentBooking?.loading_date?.slice(0, 10) ?? '—'}</td>
-                <td className="px-4 py-3 text-gray-600">{recentBooking?.booking.offloading_point ?? '—'}</td>
-                <td className="px-4 py-3 text-gray-600">{recentBooking?.loading_dispatch_date?.slice(0, 10) ?? '—'}</td>
-                <td className="px-4 py-3 text-gray-600">{recentBooking?.offloading_point_arrival_date?.slice(0, 10) ?? '—'}</td>
-                <td className="px-4 py-3 text-gray-600">{recentBooking?.offloading_date?.slice(0, 10) ?? '—'}</td>
+                <td className="px-4 py-3 text-muted-foreground">{recentBooking?.booking.loading_point ?? '—'}</td>
+                <td className="px-4 py-3 text-muted-foreground">{recentBooking?.loading_point_arrival_date?.slice(0, 10) ?? '—'}</td>
+                <td className="px-4 py-3 text-muted-foreground">{recentBooking?.loading_date?.slice(0, 10) ?? '—'}</td>
+                <td className="px-4 py-3 text-muted-foreground">{recentBooking?.booking.offloading_point ?? '—'}</td>
+                <td className="px-4 py-3 text-muted-foreground">{recentBooking?.loading_dispatch_date?.slice(0, 10) ?? '—'}</td>
+                <td className="px-4 py-3 text-muted-foreground">{recentBooking?.offloading_point_arrival_date?.slice(0, 10) ?? '—'}</td>
+                <td className="px-4 py-3 text-muted-foreground">{recentBooking?.offloading_date?.slice(0, 10) ?? '—'}</td>
                 <td className="px-4 py-3">
                   <div className="flex justify-end gap-2">
-                    <button onClick={() => onDownload(truck)} className="p-1.5 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors" title="Download tracking report">
+                    <button onClick={() => onDownload(truck)} className="p-1.5 text-muted-foreground hover:text-brand hover:bg-brand/10 rounded-lg transition-colors" title="Download tracking report">
                       <Download size={16} />
                     </button>
-                    <button onClick={() => onView(truck)} className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors" title="View / update tracking">
+                    <button onClick={() => onView(truck)} className="p-1.5 text-muted-foreground hover:text-brand hover:bg-brand/10 rounded-lg transition-colors" title="View / update tracking">
                       <Eye size={16} />
                     </button>
                   </div>
@@ -77,7 +77,7 @@ function TrackingTable({ trucks, onView, onDownload }: TrackingTableProps) {
       </table>
 
       {trucks.length === 0 && (
-        <div className="text-center py-12 text-gray-400 text-sm">No trucks in your fleet yet.</div>
+        <div className="text-center py-12 text-muted-foreground text-sm">No trucks in your fleet yet.</div>
       )}
     </div>
   )

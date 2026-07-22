@@ -10,9 +10,9 @@ interface VendorTableProps {
 
 function VendorTable({ vendors, onEdit, onDelete }: VendorTableProps) {
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-x-auto">
+    <div className="bg-card rounded-xl ring-1 ring-white/5 overflow-x-auto">
       <table className="min-w-full text-sm">
-        <thead className="bg-gray-50 text-left text-gray-500 uppercase text-xs tracking-wide">
+        <thead className="bg-surface-2 text-left text-muted-foreground uppercase text-xs tracking-wider">
           <tr>
             <th className="px-4 py-3">Company Name</th>
             <th className="px-4 py-3">Vendor Type</th>
@@ -20,20 +20,20 @@ function VendorTable({ vendors, onEdit, onDelete }: VendorTableProps) {
             <th className="px-4 py-3 text-right">Actions</th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-gray-100">
+        <tbody className="divide-y divide-hairline">
           {vendors.map((vendor) => (
-            <tr key={vendor.id} className="hover:bg-gray-50 transition-colors">
-              <td className="px-4 py-3 font-medium text-gray-800">{vendor.company_name}</td>
+            <tr key={vendor.id} className="hover:bg-surface transition-colors">
+              <td className="px-4 py-3 font-medium text-foreground">{vendor.company_name}</td>
               <td className="px-4 py-3">
                 <Badge label={vendor.vendor_type === 'fuel' ? 'Fuel' : 'E-seal'} color={vendor.vendor_type === 'fuel' ? 'yellow' : 'gray'} />
               </td>
-              <td className="px-4 py-3 text-gray-600">{vendor.phone ?? '—'}</td>
+              <td className="px-4 py-3 text-muted-foreground">{vendor.phone ?? '—'}</td>
               <td className="px-4 py-3">
                 <div className="flex justify-end gap-2">
-                  <button onClick={() => onEdit(vendor)} className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors" title="Edit vendor">
+                  <button onClick={() => onEdit(vendor)} className="p-1.5 text-muted-foreground hover:text-brand hover:bg-brand/10 rounded-lg transition-colors" title="Edit vendor">
                     <Pencil size={16} />
                   </button>
-                  <button onClick={() => onDelete(vendor)} className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors" title="Delete vendor">
+                  <button onClick={() => onDelete(vendor)} className="p-1.5 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-lg transition-colors" title="Delete vendor">
                     <Trash2 size={16} />
                   </button>
                 </div>
@@ -44,7 +44,7 @@ function VendorTable({ vendors, onEdit, onDelete }: VendorTableProps) {
       </table>
 
       {vendors.length === 0 && (
-        <div className="text-center py-12 text-gray-400 text-sm">No vendors added yet. Click "Add Vendor" to get started.</div>
+        <div className="text-center py-12 text-muted-foreground text-sm">No vendors added yet. Click "Add Vendor" to get started.</div>
       )}
     </div>
   )

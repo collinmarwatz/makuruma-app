@@ -97,39 +97,39 @@ function TruckForm({ truck, onSaved }: TruckFormProps) {
   return (
     <form onSubmit={handleSubmit}>
       {error && (
-        <div className="bg-red-50 text-red-700 text-sm rounded-lg p-3 mb-4 border border-red-100">
+        <div className="bg-destructive/10 text-destructive text-sm rounded-lg p-3 mb-4 ring-1 ring-destructive/20">
           {error}
         </div>
       )}
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Reg No</label>
+          <label className="block text-sm font-medium text-foreground mb-1">Reg No</label>
           <input
             type="text"
             value={regNo}
             onChange={(e) => setRegNo(e.target.value)}
             required
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full bg-secondary ring-1 ring-border rounded-lg px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-brand"
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Capacity (tons)</label>
+          <label className="block text-sm font-medium text-foreground mb-1">Capacity (tons)</label>
           <input
             type="number"
             step="0.01"
             value={capacity}
             onChange={(e) => setCapacity(e.target.value)}
             required
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full bg-secondary ring-1 ring-border rounded-lg px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-brand"
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
+          <label className="block text-sm font-medium text-foreground mb-1">Status</label>
           <select
             value={status}
             onChange={(e) => setStatus(e.target.value as 'active' | 'maintenance' | 'decommissioned')}
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full bg-secondary ring-1 ring-border rounded-lg px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-brand"
           >
             <option value="active">Active</option>
             <option value="maintenance">Maintenance</option>
@@ -140,11 +140,11 @@ function TruckForm({ truck, onSaved }: TruckFormProps) {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Assigned Trailer</label>
+          <label className="block text-sm font-medium text-foreground mb-1">Assigned Trailer</label>
           <select
             value={trailerId}
             onChange={(e) => setTrailerId(e.target.value)}
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full bg-secondary ring-1 ring-border rounded-lg px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-brand"
           >
             <option value="">— None —</option>
             {trailers.map((t) => (
@@ -153,11 +153,11 @@ function TruckForm({ truck, onSaved }: TruckFormProps) {
           </select>
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Assigned Driver</label>
+          <label className="block text-sm font-medium text-foreground mb-1">Assigned Driver</label>
           <select
             value={driverId}
             onChange={(e) => setDriverId(e.target.value)}
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full bg-secondary ring-1 ring-border rounded-lg px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-brand"
           >
             <option value="">— None —</option>
             {drivers.map((d) => (
@@ -168,31 +168,31 @@ function TruckForm({ truck, onSaved }: TruckFormProps) {
       </div>
 
       {isEditMode && (
-        <p className="text-xs text-gray-400 mb-4">
+        <p className="text-xs text-muted-foreground mb-4">
           Compliance documents below will be added as new entries. Editing existing documents comes in a future update.
         </p>
       )}
 
-      <h3 className="text-sm font-bold text-gray-600 mb-3">Compliance Documents</h3>
+      <h3 className="text-sm font-semibold text-foreground mb-3">Compliance Documents</h3>
       <div className="space-y-3 mb-6">
         {TRUCK_COMPLIANCE_TYPES.map(({ key, label }) => (
-          <div key={key} className="grid grid-cols-1 md:grid-cols-3 gap-3 items-end bg-gray-50 rounded-lg p-3">
-            <span className="text-sm font-medium text-gray-700">{label}</span>
+          <div key={key} className="grid grid-cols-1 md:grid-cols-3 gap-3 items-end bg-surface rounded-lg p-3 ring-1 ring-white/5">
+            <span className="text-sm font-medium text-foreground">{label}</span>
             <div>
-              <label className="block text-xs text-gray-500 mb-1">Due Date</label>
+              <label className="block text-xs text-muted-foreground mb-1">Due Date</label>
               <input
                 type="date"
                 value={compliance[key].dueDate}
                 onChange={(e) => updateCompliance(key, 'dueDate', e.target.value)}
-                className="w-full border border-gray-300 rounded-lg px-2 py-1.5 text-sm"
+                className="w-full bg-secondary ring-1 ring-border rounded-lg px-2 py-1.5 text-sm text-foreground"
               />
             </div>
             <div>
-              <label className="block text-xs text-gray-500 mb-1">Attachment (optional)</label>
+              <label className="block text-xs text-muted-foreground mb-1">Attachment (optional)</label>
               <input
                 type="file"
                 onChange={(e) => updateCompliance(key, 'attachment', e.target.files?.[0] ?? null)}
-                className="w-full text-xs"
+                className="w-full text-xs text-muted-foreground"
               />
             </div>
           </div>
@@ -202,7 +202,7 @@ function TruckForm({ truck, onSaved }: TruckFormProps) {
       <button
         type="submit"
         disabled={isSubmitting}
-        className="w-full bg-blue-600 text-white py-2.5 rounded-lg font-medium hover:bg-blue-700 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+        className="w-full bg-brand text-brand-foreground py-2.5 rounded-lg font-medium hover:opacity-90 transition-opacity disabled:opacity-50 flex items-center justify-center gap-2"
       >
         {isSubmitting && <Loader2 size={16} className="animate-spin" />}
         {isSubmitting ? 'Saving...' : isEditMode ? 'Update Truck' : 'Save Truck'}

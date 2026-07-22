@@ -173,7 +173,7 @@ function Expenses() {
     }
   }
 
-  if (error) return <p className="p-8 text-red-500">Error: {error}</p>
+  if (error) return <p className="p-8 text-destructive">Error: {error}</p>
 
   const categoryTabs: { value: ExpenseCategory | 'all'; label: string }[] = [
     { value: 'all', label: 'All' },
@@ -183,12 +183,12 @@ function Expenses() {
   ]
 
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
+    <div className="min-h-screen bg-background p-8">
       <div className="flex items-center justify-between mb-4">
-        <h1 className="text-2xl font-bold text-gray-800">Expenses</h1>
+        <h1 className="text-2xl font-semibold tracking-tight text-foreground">Expenses</h1>
         <button
           onClick={openAddModal}
-          className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2.5 rounded-lg font-medium hover:bg-blue-700 transition-colors"
+          className="flex items-center gap-2 bg-brand text-brand-foreground px-4 py-2.5 rounded-lg font-medium hover:opacity-90 transition-opacity"
         >
           <Plus size={18} />
           New Expense
@@ -196,13 +196,13 @@ function Expenses() {
       </div>
 
       <div className="flex flex-col md:flex-row md:items-center gap-3 mb-6">
-        <div className="flex gap-2 bg-gray-100 rounded-lg p-1 w-fit">
+        <div className="flex gap-2 bg-surface-2 rounded-lg p-1 w-fit ring-1 ring-white/5">
           {categoryTabs.map((tab) => (
             <button
               key={tab.value}
               onClick={() => setCategoryFilter(tab.value)}
               className={`px-4 py-1.5 rounded-md text-sm font-medium transition-colors ${
-                categoryFilter === tab.value ? 'bg-white shadow-sm text-blue-700' : 'text-gray-500'
+                categoryFilter === tab.value ? 'bg-card text-brand shadow-sm' : 'text-muted-foreground hover:text-foreground'
               }`}
             >
               {tab.label} ({categoryCounts[tab.value]})
@@ -213,7 +213,7 @@ function Expenses() {
         <select
           value={lineCategoryFilter}
           onChange={(e) => setLineCategoryFilter(e.target.value as LineCategory | 'all')}
-          className="border border-gray-300 rounded-lg px-3 py-2 text-sm"
+          className="bg-secondary ring-1 ring-border rounded-lg px-3 py-2 text-sm text-foreground"
         >
           <option value="all">All Expense Types ({lineCategoryCounts.all})</option>
           {LINE_CATEGORIES.map((cat) => (
@@ -224,14 +224,14 @@ function Expenses() {
         </select>
 
         <div className="flex items-center gap-2">
-          <label className="text-xs text-gray-500">From</label>
+          <label className="text-xs text-muted-foreground">From</label>
           <input type="date" value={dateFrom} onChange={(e) => setDateFrom(e.target.value)}
-            className="border border-gray-300 rounded-lg px-2 py-1.5 text-sm" />
-          <label className="text-xs text-gray-500">To</label>
+            className="bg-secondary ring-1 ring-border rounded-lg px-2 py-1.5 text-sm text-foreground" />
+          <label className="text-xs text-muted-foreground">To</label>
           <input type="date" value={dateTo} onChange={(e) => setDateTo(e.target.value)}
-            className="border border-gray-300 rounded-lg px-2 py-1.5 text-sm" />
+            className="bg-secondary ring-1 ring-border rounded-lg px-2 py-1.5 text-sm text-foreground" />
           {(dateFrom || dateTo) && (
-            <button onClick={() => { setDateFrom(''); setDateTo('') }} className="text-xs text-gray-400 hover:text-gray-600 underline">
+            <button onClick={() => { setDateFrom(''); setDateTo('') }} className="text-xs text-muted-foreground hover:text-foreground underline">
               Clear
             </button>
           )}

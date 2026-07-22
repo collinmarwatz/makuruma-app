@@ -2,6 +2,7 @@ import { useState, type FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import logo from '../assets/logo.png'
+import bgLogin from '../assets/bg-login.png'
 
 function Login() {
   const [email, setEmail] = useState('')
@@ -28,26 +29,31 @@ function Login() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-white-700 to-teal-900 flex items-center justify-center p-4">
-      <div className="w-full max-w-sm">
+    <div
+      className="relative min-h-screen flex items-center justify-center p-4 bg-cover bg-center"
+      style={{ backgroundImage: `url(${bgLogin})` }}
+    >
+      <div className="absolute inset-0 bg-linear-to-br from-background/90 via-background/80 to-brand/20" />
+
+      <div className="relative w-full max-w-sm">
         <div className="flex justify-center mb-6">
           <img src={logo} alt="Makuruma Logistics" className="h-16" />
         </div>
 
         <form
           onSubmit={handleSubmit}
-          className="bg-white rounded-xl shadow-xl p-8"
+          className="bg-card rounded-xl ring-1 ring-white/10 shadow-xl p-8"
         >
-          <h1 className="text-xl font-bold text-gray-800 mb-1">Welcome back</h1>
-          <p className="text-sm text-gray-400 mb-6">Sign in to manage your fleet</p>
+          <h1 className="text-xl font-semibold text-foreground mb-1">Welcome back</h1>
+          <p className="text-sm text-muted-foreground mb-6">Sign in to manage your fleet</p>
 
           {error && (
-            <div className="bg-red-50 text-red-700 text-sm rounded-lg p-3 mb-4 border border-red-100">
+            <div className="bg-destructive/10 text-destructive text-sm rounded-lg p-3 mb-4 ring-1 ring-destructive/20">
               {error}
             </div>
           )}
 
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-medium text-foreground mb-1">
             Email
           </label>
           <input
@@ -55,10 +61,10 @@ function Login() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 mb-4 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600 focus:border-transparent"
+            className="w-full bg-secondary ring-1 ring-border rounded-lg px-3 py-2 mb-4 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-brand"
           />
 
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-medium text-foreground mb-1">
             Password
           </label>
           <input
@@ -66,13 +72,13 @@ function Login() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 mb-6 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600 focus:border-transparent"
+            className="w-full bg-secondary ring-1 ring-border rounded-lg px-3 py-2 mb-6 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-brand"
           />
 
           <button
             type="submit"
             disabled={isSubmitting}
-            className="w-full bg-teal-700 text-white py-2.5 rounded-lg font-medium hover:bg-teal-800 transition-colors disabled:opacity-50"
+            className="w-full bg-brand text-brand-foreground py-2.5 rounded-lg font-medium hover:opacity-90 transition-opacity disabled:opacity-50"
           >
             {isSubmitting ? 'Logging in...' : 'Log In'}
           </button>

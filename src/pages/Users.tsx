@@ -73,15 +73,15 @@ function Users() {
     }
   }
 
-  if (error) return <p className="p-8 text-red-500">Error: {error}</p>
+  if (error) return <p className="p-8 text-destructive">Error: {error}</p>
 
   return (
-  <div className="min-h-screen bg-gray-50 p-8">
+  <div className="min-h-screen bg-background p-8">
     <div className="flex items-center justify-between mb-6">
-      <h1 className="text-2xl font-bold text-gray-800">Users</h1>
+      <h1 className="text-2xl font-semibold tracking-tight text-foreground">Users</h1>
       <button
         onClick={openAddModal}
-        className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2.5 rounded-lg font-medium hover:bg-blue-700 transition-colors"
+        className="flex items-center gap-2 bg-brand text-brand-foreground px-4 py-2.5 rounded-lg font-medium hover:opacity-90 transition-opacity"
       >
         <Plus size={18} />
         Add User

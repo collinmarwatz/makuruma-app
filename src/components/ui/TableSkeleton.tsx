@@ -1,5 +1,3 @@
-import Skeleton from './Skeleton'
-
 interface TableSkeletonProps {
   columns: number
   rows?: number
@@ -7,23 +5,12 @@ interface TableSkeletonProps {
 
 function TableSkeleton({ columns, rows = 5 }: TableSkeletonProps) {
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-      <div className="px-4 py-3 bg-gray-50 border-b border-gray-100">
-        <div className="flex gap-6">
-          {Array.from({ length: columns }).map((_, i) => (
-            <Skeleton key={i} className="h-3 w-20" />
-          ))}
-        </div>
-      </div>
-
-      <div className="divide-y divide-gray-100">
+    <div className="bg-card rounded-xl ring-1 ring-white/5 overflow-hidden">
+      <div className="animate-pulse">
         {Array.from({ length: rows }).map((_, rowIndex) => (
-          <div key={rowIndex} className="px-4 py-4 flex gap-6 items-center">
+          <div key={rowIndex} className="flex gap-4 px-4 py-3 border-b border-hairline last:border-0">
             {Array.from({ length: columns }).map((_, colIndex) => (
-              <Skeleton
-                key={colIndex}
-                className={`h-4 ${colIndex === 0 ? 'w-32' : 'w-16'}`}
-              />
+              <div key={colIndex} className="h-4 bg-muted rounded flex-1" />
             ))}
           </div>
         ))}

@@ -15,16 +15,16 @@ function Assets() {
   ]
 
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
-      <h1 className="text-2xl font-bold text-gray-800 mb-4">Assets</h1>
+    <div className="min-h-screen bg-background p-8">
+      <h1 className="text-2xl font-semibold tracking-tight text-foreground mb-4">Assets</h1>
 
-      <div className="flex gap-2 mb-6 bg-gray-100 rounded-lg p-1 w-fit">
+      <div className="flex gap-2 mb-6 bg-surface-2 rounded-lg p-1 w-fit ring-1 ring-white/5">
         {tabs.map((t) => (
           <button
             key={t.value}
             onClick={() => setTab(t.value)}
             className={`px-4 py-1.5 rounded-md text-sm font-medium transition-colors ${
-              tab === t.value ? 'bg-white shadow-sm text-blue-700' : 'text-gray-500'
+              tab === t.value ? 'bg-card text-brand shadow-sm' : 'text-muted-foreground hover:text-foreground'
             }`}
           >
             {t.label}

@@ -11,9 +11,9 @@ interface OfficeAssetTableProps {
 
 function OfficeAssetTable({ assets, onEdit, onDelete }: OfficeAssetTableProps) {
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-x-auto">
+    <div className="bg-card rounded-xl ring-1 ring-white/5 overflow-x-auto">
       <table className="min-w-full text-sm">
-        <thead className="bg-gray-50 text-left text-gray-500 uppercase text-xs tracking-wide">
+        <thead className="bg-surface-2 text-left text-muted-foreground uppercase text-xs tracking-wider">
           <tr>
             <th className="px-4 py-3">Name</th>
             <th className="px-4 py-3">Category</th>
@@ -25,27 +25,27 @@ function OfficeAssetTable({ assets, onEdit, onDelete }: OfficeAssetTableProps) {
             <th className="px-4 py-3 text-right">Actions</th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-gray-100">
+        <tbody className="divide-y divide-hairline">
           {assets.map((asset) => {
             const categoryLabel = OFFICE_ASSET_CATEGORIES.find((c) => c.value === asset.category)?.label ?? asset.category
             const conditionInfo = OFFICE_ASSET_CONDITIONS.find((c) => c.value === asset.condition)
             return (
-              <tr key={asset.id} className="hover:bg-gray-50 transition-colors">
-                <td className="px-4 py-3 font-medium text-gray-800">{asset.name}</td>
-                <td className="px-4 py-3 text-gray-600">{categoryLabel}</td>
-                <td className="px-4 py-3 text-gray-600">{asset.serial_number ?? '—'}</td>
-                <td className="px-4 py-3 text-gray-600">{asset.buying_price ? `TZS ${parseFloat(asset.buying_price).toLocaleString()}` : '—'}</td>
-                <td className="px-4 py-3 text-gray-600">{asset.purchase_date?.slice(0, 10) ?? '—'}</td>
-                <td className="px-4 py-3 text-gray-600">{asset.location ?? '—'}</td>
+              <tr key={asset.id} className="hover:bg-surface transition-colors">
+                <td className="px-4 py-3 font-medium text-foreground">{asset.name}</td>
+                <td className="px-4 py-3 text-muted-foreground">{categoryLabel}</td>
+                <td className="px-4 py-3 text-muted-foreground">{asset.serial_number ?? '—'}</td>
+                <td className="px-4 py-3 text-muted-foreground">{asset.buying_price ? `TZS ${parseFloat(asset.buying_price).toLocaleString()}` : '—'}</td>
+                <td className="px-4 py-3 text-muted-foreground">{asset.purchase_date?.slice(0, 10) ?? '—'}</td>
+                <td className="px-4 py-3 text-muted-foreground">{asset.location ?? '—'}</td>
                 <td className="px-4 py-3">
                   <Badge label={conditionInfo?.label ?? asset.condition} color={conditionInfo?.color ?? 'gray'} />
                 </td>
                 <td className="px-4 py-3">
                   <div className="flex justify-end gap-2">
-                    <button onClick={() => onEdit(asset)} className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors" title="Edit">
+                    <button onClick={() => onEdit(asset)} className="p-1.5 text-muted-foreground hover:text-brand hover:bg-brand/10 rounded-lg transition-colors" title="Edit">
                       <Pencil size={16} />
                     </button>
-                    <button onClick={() => onDelete(asset)} className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors" title="Delete">
+                    <button onClick={() => onDelete(asset)} className="p-1.5 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-lg transition-colors" title="Delete">
                       <Trash2 size={16} />
                     </button>
                   </div>
@@ -56,7 +56,7 @@ function OfficeAssetTable({ assets, onEdit, onDelete }: OfficeAssetTableProps) {
         </tbody>
       </table>
       {assets.length === 0 && (
-        <div className="text-center py-12 text-gray-400 text-sm">No office assets registered yet.</div>
+        <div className="text-center py-12 text-muted-foreground text-sm">No office assets registered yet.</div>
       )}
     </div>
   )

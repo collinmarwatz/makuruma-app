@@ -132,7 +132,7 @@ function Tracking() {
     }
   }
 
-  if (error) return <p className="p-8 text-red-500">Error: {error}</p>
+  if (error) return <p className="p-8 text-destructive">Error: {error}</p>
 
   const tabs: { value: TripStatusTab; label: string }[] = [
     { value: 'all', label: `All Trucks (${tabCounts.all})` },
@@ -142,14 +142,14 @@ function Tracking() {
   ]
 
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
+    <div className="min-h-screen bg-background p-8">
       <div className="flex items-center justify-between mb-1">
-        <h1 className="text-2xl font-bold text-gray-800">Tracking</h1>
+        <h1 className="text-2xl font-semibold tracking-tight text-foreground">Tracking</h1>
         <div className="flex gap-2">
           <button
             onClick={handleExportCsv}
             disabled={isExporting || filteredTrucks.length === 0}
-            className="flex items-center gap-2 bg-white border border-gray-200 text-gray-700 px-4 py-2.5 rounded-lg font-medium hover:bg-gray-50 transition-colors disabled:opacity-50"
+            className="flex items-center gap-2 bg-secondary text-secondary-foreground px-4 py-2.5 rounded-lg font-medium ring-1 ring-border hover:bg-surface transition-colors disabled:opacity-50"
           >
             <Download size={18} />
             {isExporting ? 'Exporting...' : `Export CSV ${filteredTrucks.length > 0 ? `(${filteredTrucks.length})` : ''}`}
@@ -157,22 +157,22 @@ function Tracking() {
           <button
             onClick={handleExportExcel}
             disabled={isExportingExcel}
-            className="flex items-center gap-2 bg-white border border-gray-200 text-gray-700 px-4 py-2.5 rounded-lg font-medium hover:bg-gray-50 transition-colors disabled:opacity-50"
+            className="flex items-center gap-2 bg-secondary text-secondary-foreground px-4 py-2.5 rounded-lg font-medium ring-1 ring-border hover:bg-surface transition-colors disabled:opacity-50"
           >
             <FileSpreadsheet size={18} />
             {isExportingExcel ? 'Exporting...' : 'Export Excel'}
           </button>
         </div>
       </div>
-      <p className="text-sm text-gray-400 mb-4">Live status and checkpoint milestones for every truck in your fleet.</p>
+      <p className="text-sm text-muted-foreground mb-4">Live status and checkpoint milestones for every truck in your fleet.</p>
 
-      <div className="flex gap-2 mb-4 bg-gray-100 rounded-lg p-1 w-fit overflow-x-auto">
+      <div className="flex gap-2 mb-4 bg-surface-2 rounded-lg p-1 w-fit overflow-x-auto ring-1 ring-white/5">
         {tabs.map((tab) => (
           <button
             key={tab.value}
             onClick={() => setTripStatusTab(tab.value)}
             className={`px-4 py-1.5 rounded-md text-sm font-medium whitespace-nowrap transition-colors ${
-              tripStatusTab === tab.value ? 'bg-white shadow-sm text-blue-700' : 'text-gray-500'
+              tripStatusTab === tab.value ? 'bg-card text-brand shadow-sm' : 'text-muted-foreground hover:text-foreground'
             }`}
           >
             {tab.label}
@@ -182,13 +182,13 @@ function Tracking() {
 
       <div className="flex flex-col md:flex-row gap-3 mb-6">
         <div className="relative flex-1">
-          <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+          <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
           <input
             type="text"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             placeholder="Search by truck, driver, or trip code..."
-            className="w-full border border-gray-300 rounded-lg pl-9 pr-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full bg-secondary ring-1 ring-border rounded-lg pl-9 pr-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-brand"
           />
         </div>
         <input
@@ -196,12 +196,12 @@ function Tracking() {
           value={bookingNumberFilter}
           onChange={(e) => setBookingNumberFilter(e.target.value)}
           placeholder="Filter by Booking No..."
-          className="border border-gray-300 rounded-lg px-3 py-2 text-sm"
+          className="bg-secondary ring-1 ring-border rounded-lg px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground"
         />
         <select
           value={clientFilter}
           onChange={(e) => setClientFilter(e.target.value)}
-          className="border border-gray-300 rounded-lg px-3 py-2 text-sm"
+          className="bg-secondary ring-1 ring-border rounded-lg px-3 py-2 text-sm text-foreground"
         >
           <option value="">All Clients</option>
           {clients.map((c) => <option key={c.id} value={c.id}>{c.company_name}</option>)}
@@ -209,7 +209,7 @@ function Tracking() {
         <select
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value as TrackingStatus | 'all')}
-          className="border border-gray-300 rounded-lg px-3 py-2 text-sm"
+          className="bg-secondary ring-1 ring-border rounded-lg px-3 py-2 text-sm text-foreground"
         >
           <option value="all">All Statuses</option>
           {TRACKING_STATUS_OPTIONS.map((opt) => (

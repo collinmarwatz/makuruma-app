@@ -262,21 +262,21 @@ function ExpenseForm({ expense, onSaved }: ExpenseFormProps) {
 
   return (
     <form onSubmit={handleSubmit}>
-      {error && <div className="bg-red-50 text-red-700 text-sm rounded-lg p-3 mb-4 border border-red-100">{error}</div>}
+      {error && <div className="bg-destructive/10 text-destructive text-sm rounded-lg p-3 mb-4 ring-1 ring-destructive/20">{error}</div>}
 
       <div className="mb-4">
-        <label className="block text-sm font-medium text-gray-700 mb-1">Expense Reference No.</label>
+        <label className="block text-sm font-medium text-foreground mb-1">Expense Reference No.</label>
         <input type="text" value={referenceNo} onChange={(e) => setReferenceNo(e.target.value)}
-          placeholder="e.g. 82" className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" />
-        <p className="text-xs text-gray-400 mt-1">Must be unique across all expense orders.</p>
+          placeholder="e.g. 82" className="w-full bg-secondary ring-1 ring-border rounded-lg px-3 py-2 text-sm text-foreground" />
+        <p className="text-xs text-muted-foreground mt-1">Must be unique across all expense orders.</p>
       </div>
 
       {!isEditMode && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
+            <label className="block text-sm font-medium text-foreground mb-1">Category</label>
             <select value={category} onChange={(e) => setCategory(e.target.value as ExpenseCategory)}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm">
+              className="w-full bg-secondary ring-1 ring-border rounded-lg px-3 py-2 text-sm text-foreground">
               <option value="trip">Trip</option>
               <option value="office">Office</option>
               <option value="truck">Truck</option>
@@ -285,9 +285,9 @@ function ExpenseForm({ expense, onSaved }: ExpenseFormProps) {
 
           {category === 'trip' && (
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Booking</label>
+              <label className="block text-sm font-medium text-foreground mb-1">Booking</label>
               <select value={bookingId} onChange={(e) => { setBookingId(e.target.value); setRows([newRow('fuel')]) }}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm">
+                className="w-full bg-secondary ring-1 ring-border rounded-lg px-3 py-2 text-sm text-foreground">
                 <option value="">— Select —</option>
                 {bookings.map((b) => (
                   <option key={b.id} value={b.id}>{b.booking_number} ({b.direction.toUpperCase()}) — {b.client.company_name}</option>
@@ -298,9 +298,9 @@ function ExpenseForm({ expense, onSaved }: ExpenseFormProps) {
 
           {category === 'truck' && (
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Truck</label>
+              <label className="block text-sm font-medium text-foreground mb-1">Truck</label>
               <select value={truckId} onChange={(e) => setTruckId(e.target.value)}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm">
+                className="w-full bg-secondary ring-1 ring-border rounded-lg px-3 py-2 text-sm text-foreground">
                 <option value="">— Select —</option>
                 {trucks.map((t) => <option key={t.id} value={t.id}>{t.reg_no}</option>)}
               </select>
@@ -311,24 +311,24 @@ function ExpenseForm({ expense, onSaved }: ExpenseFormProps) {
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Payment Account</label>
+          <label className="block text-sm font-medium text-foreground mb-1">Payment Account</label>
           <input type="text" value={paymentAccount} onChange={(e) => setPaymentAccount(e.target.value)}
-            placeholder="e.g. CRDB - 0123456" className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" />
+            placeholder="e.g. CRDB - 0123456" className="w-full bg-secondary ring-1 ring-border rounded-lg px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground" />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Initiated By</label>
+          <label className="block text-sm font-medium text-foreground mb-1">Initiated By</label>
           <input type="text" value={initiatedBy} onChange={(e) => setInitiatedBy(e.target.value)}
-            placeholder="Name of person" className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" />
+            placeholder="Name of person" className="w-full bg-secondary ring-1 ring-border rounded-lg px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground" />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Payment Date</label>
+          <label className="block text-sm font-medium text-foreground mb-1">Payment Date</label>
           <input type="date" value={paymentDate} onChange={(e) => setPaymentDate(e.target.value)}
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" />
+            className="w-full bg-secondary ring-1 ring-border rounded-lg px-3 py-2 text-sm text-foreground" />
         </div>
       </div>
 
       {category === 'trip' && bookingId && bookingTrucks.length === 0 && (
-        <p className="text-xs text-yellow-600 bg-yellow-50 rounded-lg p-2 mb-4">This booking has no trucks assigned yet.</p>
+        <p className="text-xs text-warn bg-warn/10 ring-1 ring-warn/20 rounded-lg p-2 mb-4">This booking has no trucks assigned yet.</p>
       )}
 
       {LINE_CATEGORIES.map((cat) => {
@@ -336,38 +336,38 @@ function ExpenseForm({ expense, onSaved }: ExpenseFormProps) {
         return (
           <div key={cat.value} className="mb-6">
             <div className="flex items-center justify-between mb-2">
-              <h3 className="text-sm font-bold text-gray-600">{cat.label}</h3>
-              <button type="button" onClick={() => addRow(cat.value)} className="flex items-center gap-1 text-xs text-blue-600 font-medium hover:text-blue-700">
+              <h3 className="text-sm font-semibold text-foreground">{cat.label}</h3>
+              <button type="button" onClick={() => addRow(cat.value)} className="flex items-center gap-1 text-xs text-brand font-medium hover:opacity-80">
                 <Plus size={12} /> Add line
               </button>
             </div>
 
             {catRows.length === 0 ? (
-              <p className="text-xs text-gray-400">No lines yet.</p>
+              <p className="text-xs text-muted-foreground">No lines yet.</p>
             ) : (
               <div className="space-y-3">
                 {catRows.map((row) => (
-                  <div key={row.key} className="bg-gray-50 rounded-lg p-3">
+                  <div key={row.key} className="bg-surface rounded-lg p-3 ring-1 ring-white/5">
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-2 mb-2">
                       {cat.needsVendor && (
                         <div>
-                          <label className="block text-xs text-gray-500 mb-1">Vendor</label>
+                          <label className="block text-xs text-muted-foreground mb-1">Vendor</label>
                           <select value={row.vendorId} onChange={(e) => updateRow(row.key, 'vendorId', e.target.value)}
-                            className="w-full border border-gray-300 rounded-lg px-2 py-1.5 text-sm">
+                            className="w-full bg-secondary ring-1 ring-border rounded-lg px-2 py-1.5 text-sm text-foreground">
                             <option value="">— Select —</option>
                             {fuelVendors.map((v) => <option key={v.id} value={v.id}>{v.company_name}</option>)}
                           </select>
                         </div>
                       )}
                       <div className={cat.needsVendor ? '' : 'md:col-span-2'}>
-                        <label className="block text-xs text-gray-500 mb-1">Description</label>
+                        <label className="block text-xs text-muted-foreground mb-1">Description</label>
                         <input type="text" value={row.description} onChange={(e) => updateRow(row.key, 'description', e.target.value)}
-                          className="w-full border border-gray-300 rounded-lg px-2 py-1.5 text-sm" />
+                          className="w-full bg-secondary ring-1 ring-border rounded-lg px-2 py-1.5 text-sm text-foreground" />
                       </div>
                       <div>
-                        <label className="block text-xs text-gray-500 mb-1">Currency</label>
+                        <label className="block text-xs text-muted-foreground mb-1">Currency</label>
                         <select value={row.currency} onChange={(e) => updateRow(row.key, 'currency', e.target.value)}
-                          className="w-full border border-gray-300 rounded-lg px-2 py-1.5 text-sm">
+                          className="w-full bg-secondary ring-1 ring-border rounded-lg px-2 py-1.5 text-sm text-foreground">
                           {CURRENCIES.map((c) => <option key={c.value} value={c.value}>{c.label}</option>)}
                         </select>
                       </div>
@@ -375,34 +375,34 @@ function ExpenseForm({ expense, onSaved }: ExpenseFormProps) {
 
                     {row.currency !== 'TZS' && (
                       <div className="mb-2 w-40">
-                        <label className="block text-xs text-gray-500 mb-1">Exchange Rate</label>
+                        <label className="block text-xs text-muted-foreground mb-1">Exchange Rate</label>
                         <input type="number" step="0.0001" value={row.exchangeRate} onChange={(e) => updateRow(row.key, 'exchangeRate', e.target.value)}
-                          className="w-full border border-gray-300 rounded-lg px-2 py-1.5 text-sm" />
+                          className="w-full bg-secondary ring-1 ring-border rounded-lg px-2 py-1.5 text-sm text-foreground" />
                       </div>
                     )}
 
                     {row.lineCategory === 'fuel' ? (
                       <div className="mb-2 w-40">
-                        <label className="block text-xs text-gray-500 mb-1">Rate (per litre)</label>
+                        <label className="block text-xs text-muted-foreground mb-1">Rate (per litre)</label>
                         <input type="number" step="0.01" value={row.unitRate} onChange={(e) => updateRow(row.key, 'unitRate', e.target.value)}
-                          className="w-full border border-gray-300 rounded-lg px-2 py-1.5 text-sm" />
+                          className="w-full bg-secondary ring-1 ring-border rounded-lg px-2 py-1.5 text-sm text-foreground" />
                       </div>
                     ) : (
                       <div className="mb-2 w-40">
-                        <label className="block text-xs text-gray-500 mb-1">Amount (per truck)</label>
+                        <label className="block text-xs text-muted-foreground mb-1">Amount (per truck)</label>
                         <input type="number" step="0.01" value={row.originalAmount} onChange={(e) => updateRow(row.key, 'originalAmount', e.target.value)}
-                          className="w-full border border-gray-300 rounded-lg px-2 py-1.5 text-sm" />
+                          className="w-full bg-secondary ring-1 ring-border rounded-lg px-2 py-1.5 text-sm text-foreground" />
                       </div>
                     )}
 
                     <div className="flex items-center justify-between mb-1">
-                      <label className="block text-xs text-gray-500">Applies To ({row.selectedTruckIds.length} selected)</label>
+                      <label className="block text-xs text-muted-foreground">Applies To ({row.selectedTruckIds.length} selected)</label>
                       <div className="flex gap-2">
-                        <button type="button" onClick={() => selectAllTrucksForRow(row.key)} className="text-xs text-blue-600 hover:text-blue-700">Select All</button>
-                        <button type="button" onClick={() => clearTrucksForRow(row.key)} className="text-xs text-gray-400 hover:text-gray-600">Clear</button>
+                        <button type="button" onClick={() => selectAllTrucksForRow(row.key)} className="text-xs text-brand hover:opacity-80">Select All</button>
+                        <button type="button" onClick={() => clearTrucksForRow(row.key)} className="text-xs text-muted-foreground hover:text-foreground">Clear</button>
                       </div>
                     </div>
-                    <div className="border border-gray-200 rounded-lg divide-y divide-gray-100 max-h-36 overflow-y-auto bg-white">
+                    <div className="ring-1 ring-border rounded-lg divide-y divide-hairline max-h-36 overflow-y-auto bg-card">
                       {bookingTrucks.map((bt) => {
                         const btId = bt.id.toString()
                         const checked = row.selectedTruckIds.includes(btId)
@@ -410,13 +410,13 @@ function ExpenseForm({ expense, onSaved }: ExpenseFormProps) {
                           <div key={bt.id} className="px-2 py-1.5">
                             <label className="flex items-center gap-2 text-sm cursor-pointer">
                               <input type="checkbox" checked={checked} onChange={() => toggleRowTruck(row.key, btId)} className="cursor-pointer" />
-                              <span className="font-medium text-gray-800">{bt.truck.reg_no}</span>
+                              <span className="font-medium text-foreground">{bt.truck.reg_no}</span>
                             </label>
                             {checked && row.lineCategory === 'fuel' && (
                               <div className="ml-6 mt-1">
                                 <input type="number" step="0.01" value={row.truckLitres[btId] ?? ''}
                                   onChange={(e) => updateLitres(row.key, btId, e.target.value)}
-                                  placeholder="Litres" className="w-32 border border-gray-300 rounded-lg px-2 py-1 text-xs" />
+                                  placeholder="Litres" className="w-32 bg-secondary ring-1 ring-border rounded-lg px-2 py-1 text-xs text-foreground" />
                               </div>
                             )}
                           </div>
@@ -424,12 +424,12 @@ function ExpenseForm({ expense, onSaved }: ExpenseFormProps) {
                       })}
                     </div>
 
-                    <div className="mt-2 text-right text-xs text-gray-500">
-                      Line total: <span className="font-semibold text-gray-700">TZS {computeRowTzsTotal(row).toLocaleString()}</span>
+                    <div className="mt-2 text-right text-xs text-muted-foreground">
+                      Line total: <span className="font-semibold text-foreground">TZS {computeRowTzsTotal(row).toLocaleString()}</span>
                     </div>
 
                     <div className="flex justify-end mt-1">
-                      <button type="button" onClick={() => removeRow(row.key)} className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors">
+                      <button type="button" onClick={() => removeRow(row.key)} className="p-1.5 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-lg transition-colors">
                         <Trash2 size={14} />
                       </button>
                     </div>
@@ -441,13 +441,13 @@ function ExpenseForm({ expense, onSaved }: ExpenseFormProps) {
         )
       })}
 
-      <div className="bg-gray-50 rounded-lg p-3 mb-6 flex justify-between items-center">
-        <span className="text-sm font-medium text-gray-600">Total (TZS)</span>
-        <span className="text-lg font-bold text-gray-800">TZS {total.toLocaleString()}</span>
+      <div className="bg-surface rounded-lg p-3 mb-6 flex justify-between items-center ring-1 ring-white/5">
+        <span className="text-sm font-medium text-muted-foreground">Total (TZS)</span>
+        <span className="text-lg font-semibold text-foreground">TZS {total.toLocaleString()}</span>
       </div>
 
       <button type="submit" disabled={isSubmitting}
-        className="w-full bg-blue-600 text-white py-2.5 rounded-lg font-medium hover:bg-blue-700 transition-colors disabled:opacity-50 flex items-center justify-center gap-2">
+        className="w-full bg-brand text-brand-foreground py-2.5 rounded-lg font-medium hover:opacity-90 transition-opacity disabled:opacity-50 flex items-center justify-center gap-2">
         {isSubmitting && <Loader2 size={16} className="animate-spin" />}
         {isSubmitting ? 'Saving...' : isEditMode ? 'Update Expense' : 'Create Expense Order'}
       </button>

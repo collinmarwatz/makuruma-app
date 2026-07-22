@@ -14,7 +14,7 @@ function ExpenseByCategoryChart({ data }: ExpenseByCategoryChartProps) {
   ].filter((d) => d.value > 0)
 
   if (chartData.length === 0) {
-    return <p className="text-sm text-gray-400 text-center py-12">No expense data yet.</p>
+    return <p className="text-sm text-muted-foreground text-center py-12">No expense data yet.</p>
   }
 
   return (
@@ -25,8 +25,12 @@ function ExpenseByCategoryChart({ data }: ExpenseByCategoryChartProps) {
             <Cell key={index} fill={COLORS[index % COLORS.length]} />
           ))}
         </Pie>
-        <Tooltip formatter={(value) => `Tsh${Number(value).toLocaleString()}`} />
-        <Legend />
+        <Tooltip
+          formatter={(value) => `Tsh${Number(value).toLocaleString()}`}
+          contentStyle={{ background: '#171719', border: '1px solid #262629', borderRadius: 8, color: '#f1f1f4' }}
+          labelStyle={{ color: '#f1f1f4' }}
+        />
+        <Legend wrapperStyle={{ color: '#97989d' }} />
       </PieChart>
     </ResponsiveContainer>
   )

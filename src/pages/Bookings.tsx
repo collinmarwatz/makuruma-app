@@ -68,18 +68,18 @@ function Bookings() {
     }
   }
 
-  if (error) return <p className="p-8 text-red-500">Error: {error}</p>
+  if (error) return <p className="p-8 text-destructive">Error: {error}</p>
 
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
+    <div className="min-h-screen bg-background p-8">
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-gray-800">Bookings</h1>
+        <h1 className="text-2xl font-semibold tracking-tight text-foreground">Bookings</h1>
         <div className="flex gap-2">
-          <button onClick={() => openAddModal('go')} className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2.5 rounded-lg font-medium hover:bg-blue-700 transition-colors">
+          <button onClick={() => openAddModal('go')} className="flex items-center gap-2 bg-brand text-brand-foreground px-4 py-2.5 rounded-lg font-medium hover:opacity-90 transition-opacity">
             <Plus size={18} />
             New Go Booking
           </button>
-          <button onClick={() => openAddModal('return')} className="flex items-center gap-2 bg-white border border-gray-200 text-gray-700 px-4 py-2.5 rounded-lg font-medium hover:bg-gray-50 transition-colors">
+          <button onClick={() => openAddModal('return')} className="flex items-center gap-2 bg-secondary text-secondary-foreground px-4 py-2.5 rounded-lg font-medium ring-1 ring-border hover:bg-surface transition-colors">
             <Plus size={18} />
             New Return Booking
           </button>
@@ -87,7 +87,7 @@ function Bookings() {
       </div>
 
       {loading ? (
-        <TableSkeleton columns={13} />
+        <TableSkeleton columns={8} />
       ) : (
         <BookingTable bookings={bookings} onEdit={openEditModal} onDelete={handleDelete} onDownload={handleDownload} />
       )}

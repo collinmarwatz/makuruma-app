@@ -1,4 +1,50 @@
 @import "tailwindcss";
+
+@theme inline {
+  --color-background: #0a0a0c;
+  --color-foreground: #f1f1f4;
+  --color-card: #171719;
+  --color-card-foreground: #f1f1f4;
+  --color-popover: #171719;
+  --color-popover-foreground: #f1f1f4;
+  --color-primary: #2a7f88;
+  --color-primary-foreground: #f8f8f8;
+  --color-secondary: #262629;
+  --color-secondary-foreground: #f1f1f4;
+  --color-muted: #262629;
+  --color-muted-foreground: #97989d;
+  --color-accent: #f8a13f;
+  --color-accent-foreground: #0d0d0f;
+  --color-destructive: #f1383e;
+  --color-destructive-foreground: #f8f8f8;
+  --color-border: #262629;
+  --color-input: #262629;
+  --color-ring: #2a7f88;
+
+  --color-brand: #2a7f88;
+  --color-brand-foreground: #f8f8f8;
+  --color-warn: #f8a13f;
+  --color-warn-foreground: #0d0d0f;
+  --color-surface: #171719;
+  --color-surface-2: #131316;
+  --color-hairline: #262629;
+
+  --radius-sm: calc(0.625rem - 4px);
+  --radius-md: calc(0.625rem - 2px);
+  --radius-lg: 0.625rem;
+  --radius-xl: calc(0.625rem + 4px);
+  --radius-2xl: calc(0.625rem + 8px);
+}
+
+html,
+body {
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+  font-family:
+    ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
+}
+
 @layer base {
   button:not(:disabled) {
     cursor: pointer;

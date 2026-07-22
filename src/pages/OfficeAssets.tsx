@@ -49,12 +49,12 @@ function OfficeAssets() {
     }
   }
 
-  if (error) return <p className="text-red-500">Error: {error}</p>
+  if (error) return <p className="text-destructive">Error: {error}</p>
 
   return (
     <div>
       <div className="flex items-center justify-end mb-4">
-        <button onClick={openAddModal} className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2.5 rounded-lg font-medium hover:bg-blue-700 transition-colors">
+        <button onClick={openAddModal} className="flex items-center gap-2 bg-brand text-brand-foreground px-4 py-2.5 rounded-lg font-medium hover:opacity-90 transition-opacity">
           <Plus size={18} />
           Add Office Asset
         </button>

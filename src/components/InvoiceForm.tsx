@@ -265,20 +265,20 @@ function InvoiceForm({ invoice, onSaved }: InvoiceFormProps) {
 
   return (
     <form onSubmit={handleSubmit}>
-      {error && <div className="bg-red-50 text-red-700 text-sm rounded-lg p-3 mb-4 border border-red-100">{error}</div>}
+      {error && <div className="bg-destructive/10 text-destructive text-sm rounded-lg p-3 mb-4 ring-1 ring-destructive/20">{error}</div>}
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Invoice Type</label>
+          <label className="block text-sm font-medium text-foreground mb-1">Invoice Type</label>
           <select value={invoiceType} onChange={(e) => setInvoiceType(e.target.value as InvoiceType)} disabled={isEditMode}
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm disabled:bg-gray-50">
+            className="w-full bg-secondary ring-1 ring-border rounded-lg px-3 py-2 text-sm text-foreground disabled:opacity-60">
             {INVOICE_TYPES.map((t) => <option key={t.value} value={t.value}>{t.label}</option>)}
           </select>
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Booking</label>
+          <label className="block text-sm font-medium text-foreground mb-1">Booking</label>
           <select value={bookingId} onChange={(e) => setBookingId(e.target.value)} disabled={isEditMode}
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm disabled:bg-gray-50">
+            className="w-full bg-secondary ring-1 ring-border rounded-lg px-3 py-2 text-sm text-foreground disabled:opacity-60">
             <option value="">— Select —</option>
             {bookings.map((b) => (
               <option key={b.id} value={b.id}>{b.booking_number} — {b.client.company_name}</option>
@@ -289,42 +289,42 @@ function InvoiceForm({ invoice, onSaved }: InvoiceFormProps) {
           </select>
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Invoice Date</label>
+          <label className="block text-sm font-medium text-foreground mb-1">Invoice Date</label>
           <input type="date" value={invoiceDate} onChange={(e) => setInvoiceDate(e.target.value)}
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" />
+            className="w-full bg-secondary ring-1 ring-border rounded-lg px-3 py-2 text-sm text-foreground" />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Exchange Rate ($→TZS)</label>
+          <label className="block text-sm font-medium text-foreground mb-1">Exchange Rate ($→TZS)</label>
           <input type="number" step="0.0001" value={exchangeRate} onChange={(e) => setExchangeRate(e.target.value)}
-            placeholder="e.g. 2690" className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" />
+            placeholder="e.g. 2690" className="w-full bg-secondary ring-1 ring-border rounded-lg px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground" />
         </div>
       </div>
 
       <details className="mb-6">
-        <summary className="text-sm font-medium text-gray-600 cursor-pointer mb-2">Additional Reference Details</summary>
+        <summary className="text-sm font-medium text-muted-foreground cursor-pointer mb-2">Additional Reference Details</summary>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mt-2">
-          <input type="text" value={dealNo} onChange={(e) => setDealNo(e.target.value)} placeholder="Deal No" className="border border-gray-300 rounded-lg px-3 py-2 text-sm" />
-          <input type="text" value={bivacNo} onChange={(e) => setBivacNo(e.target.value)} placeholder="Bivac No" className="border border-gray-300 rounded-lg px-3 py-2 text-sm" />
-          <input type="text" value={modeOfPayment} onChange={(e) => setModeOfPayment(e.target.value)} placeholder="Mode of Payment" className="border border-gray-300 rounded-lg px-3 py-2 text-sm" />
-          <input type="text" value={supplierRef} onChange={(e) => setSupplierRef(e.target.value)} placeholder="Supplier's Ref" className="border border-gray-300 rounded-lg px-3 py-2 text-sm" />
-          <input type="text" value={otherRef} onChange={(e) => setOtherRef(e.target.value)} placeholder="Other Reference(s)" className="border border-gray-300 rounded-lg px-3 py-2 text-sm" />
-          <input type="text" value={deliveryNoteNo} onChange={(e) => setDeliveryNoteNo(e.target.value)} placeholder="Delivery Note No" className="border border-gray-300 rounded-lg px-3 py-2 text-sm" />
-          <input type="date" value={deliveryNoteDate} onChange={(e) => setDeliveryNoteDate(e.target.value)} placeholder="Delivery Note Date" className="border border-gray-300 rounded-lg px-3 py-2 text-sm" />
-          <input type="text" value={loadingConNo} onChange={(e) => setLoadingConNo(e.target.value)} placeholder="Loading Con No" className="border border-gray-300 rounded-lg px-3 py-2 text-sm" />
-          <input type="text" value={settlementNo} onChange={(e) => setSettlementNo(e.target.value)} placeholder="Settlement No" className="border border-gray-300 rounded-lg px-3 py-2 text-sm" />
-          <input type="text" value={dispatchedThrough} onChange={(e) => setDispatchedThrough(e.target.value)} placeholder="Dispatched Through" className="border border-gray-300 rounded-lg px-3 py-2 text-sm" />
-          <input type="text" value={destination} onChange={(e) => setDestination(e.target.value)} placeholder="Destination" className="border border-gray-300 rounded-lg px-3 py-2 text-sm" />
-          <input type="text" value={termsOfDelivery} onChange={(e) => setTermsOfDelivery(e.target.value)} placeholder="Terms of Delivery" className="border border-gray-300 rounded-lg px-3 py-2 text-sm" />
+          <input type="text" value={dealNo} onChange={(e) => setDealNo(e.target.value)} placeholder="Deal No" className="bg-secondary ring-1 ring-border rounded-lg px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground" />
+          <input type="text" value={bivacNo} onChange={(e) => setBivacNo(e.target.value)} placeholder="Bivac No" className="bg-secondary ring-1 ring-border rounded-lg px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground" />
+          <input type="text" value={modeOfPayment} onChange={(e) => setModeOfPayment(e.target.value)} placeholder="Mode of Payment" className="bg-secondary ring-1 ring-border rounded-lg px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground" />
+          <input type="text" value={supplierRef} onChange={(e) => setSupplierRef(e.target.value)} placeholder="Supplier's Ref" className="bg-secondary ring-1 ring-border rounded-lg px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground" />
+          <input type="text" value={otherRef} onChange={(e) => setOtherRef(e.target.value)} placeholder="Other Reference(s)" className="bg-secondary ring-1 ring-border rounded-lg px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground" />
+          <input type="text" value={deliveryNoteNo} onChange={(e) => setDeliveryNoteNo(e.target.value)} placeholder="Delivery Note No" className="bg-secondary ring-1 ring-border rounded-lg px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground" />
+          <input type="date" value={deliveryNoteDate} onChange={(e) => setDeliveryNoteDate(e.target.value)} placeholder="Delivery Note Date" className="bg-secondary ring-1 ring-border rounded-lg px-3 py-2 text-sm text-foreground" />
+          <input type="text" value={loadingConNo} onChange={(e) => setLoadingConNo(e.target.value)} placeholder="Loading Con No" className="bg-secondary ring-1 ring-border rounded-lg px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground" />
+          <input type="text" value={settlementNo} onChange={(e) => setSettlementNo(e.target.value)} placeholder="Settlement No" className="bg-secondary ring-1 ring-border rounded-lg px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground" />
+          <input type="text" value={dispatchedThrough} onChange={(e) => setDispatchedThrough(e.target.value)} placeholder="Dispatched Through" className="bg-secondary ring-1 ring-border rounded-lg px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground" />
+          <input type="text" value={destination} onChange={(e) => setDestination(e.target.value)} placeholder="Destination" className="bg-secondary ring-1 ring-border rounded-lg px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground" />
+          <input type="text" value={termsOfDelivery} onChange={(e) => setTermsOfDelivery(e.target.value)} placeholder="Terms of Delivery" className="bg-secondary ring-1 ring-border rounded-lg px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground" />
         </div>
       </details>
 
-      <h3 className="text-sm font-bold text-gray-600 mb-2">
+      <h3 className="text-sm font-semibold text-foreground mb-2">
         {isEditMode ? 'Trucks on this Invoice' : `Select Truck(s) — not yet invoiced under ${typeConfig.label}`}
       </h3>
 
-      {truckState.loading && <p className="text-sm text-gray-400 mb-4">Loading eligible trucks...</p>}
+      {truckState.loading && <p className="text-sm text-muted-foreground mb-4">Loading eligible trucks...</p>}
       {!isEditMode && !truckState.loading && bookingId && truckState.eligible.length === 0 && (
-        <p className="text-sm text-gray-400 mb-4">All trucks in this booking already have a {typeConfig.label} invoice.</p>
+        <p className="text-sm text-muted-foreground mb-4">All trucks in this booking already have a {typeConfig.label} invoice.</p>
       )}
 
       <div className="space-y-2 mb-6">
@@ -334,18 +334,18 @@ function InvoiceForm({ invoice, onSaved }: InvoiceFormProps) {
           const line = truckState.lineData[truckId]
 
           return (
-            <div key={bt.id} className="border border-gray-200 rounded-lg overflow-hidden">
-              <label className={`flex items-center gap-3 px-3 py-2 text-sm ${isEditMode ? '' : 'cursor-pointer hover:bg-gray-50'}`}>
+            <div key={bt.id} className="ring-1 ring-border rounded-lg overflow-hidden">
+              <label className={`flex items-center gap-3 px-3 py-2 text-sm ${isEditMode ? '' : 'cursor-pointer hover:bg-surface'}`}>
                 <input type="checkbox" checked={checked} disabled={isEditMode}
                   onChange={() => toggleTruck(truckId, bt.capacity, bt.rate)} className={isEditMode ? '' : 'cursor-pointer'} />
-                <span className="font-medium text-gray-800">{bt.truck.reg_no}</span>
-                <span className="text-gray-400 text-xs">{bt.trailer?.reg_no ?? 'no trailer'} · {bt.trip?.trip_code ?? '—'}</span>
+                <span className="font-medium text-foreground">{bt.truck.reg_no}</span>
+                <span className="text-muted-foreground text-xs">{bt.trailer?.reg_no ?? 'no trailer'} · {bt.trip?.trip_code ?? '—'}</span>
               </label>
 
               {checked && line && (
-                <div className="bg-gray-50 p-3 border-t border-gray-200">
+                <div className="bg-surface p-3 border-t border-hairline">
                   {invoiceType === 'advance' && (
-                    <label className="flex items-center gap-2 text-xs text-gray-600 mb-2 cursor-pointer">
+                    <label className="flex items-center gap-2 text-xs text-muted-foreground mb-2 cursor-pointer">
                       <input type="checkbox" checked={line.isFlatAmount}
                         onChange={(e) => updateLine(truckId, 'isFlatAmount', e.target.checked)} className="cursor-pointer" />
                       Enter a flat agreed amount instead of calculating
@@ -355,14 +355,14 @@ function InvoiceForm({ invoice, onSaved }: InvoiceFormProps) {
                   {invoiceType === 'advance' && line.isFlatAmount ? (
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                       <div>
-                        <label className="block text-xs text-gray-500 mb-1">Flat Amount ($)</label>
+                        <label className="block text-xs text-muted-foreground mb-1">Flat Amount ($)</label>
                         <input type="number" step="0.01" value={line.flatAmount} onChange={(e) => updateLine(truckId, 'flatAmount', e.target.value)}
-                          className="w-full border border-gray-300 rounded-lg px-2 py-1.5 text-sm" />
+                          className="w-full bg-secondary ring-1 ring-border rounded-lg px-2 py-1.5 text-sm text-foreground" />
                       </div>
                       <div className="md:col-span-2 flex items-end">
-                        <div className="bg-blue-50 rounded-lg px-3 py-2 text-sm w-full flex justify-between">
-                          <span className="text-blue-700">Amount</span>
-                          <span className="font-bold text-blue-800">${computeAmount(truckId).toLocaleString()}</span>
+                        <div className="bg-brand/10 ring-1 ring-brand/20 rounded-lg px-3 py-2 text-sm w-full flex justify-between">
+                          <span className="text-brand">Amount</span>
+                          <span className="font-semibold text-brand">${computeAmount(truckId).toLocaleString()}</span>
                         </div>
                       </div>
                     </div>
@@ -370,33 +370,33 @@ function InvoiceForm({ invoice, onSaved }: InvoiceFormProps) {
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
                       {invoiceType === 'standing_time' ? (
                         <div>
-                          <label className="block text-xs text-gray-500 mb-1">Days</label>
+                          <label className="block text-xs text-muted-foreground mb-1">Days</label>
                           <input type="number" value={line.days} onChange={(e) => updateLine(truckId, 'days', e.target.value)}
-                            className="w-full border border-gray-300 rounded-lg px-2 py-1.5 text-sm" />
+                            className="w-full bg-secondary ring-1 ring-border rounded-lg px-2 py-1.5 text-sm text-foreground" />
                         </div>
                       ) : (
                         <div>
-                          <label className="block text-xs text-gray-500 mb-1">{typeConfig.quantityLabel}</label>
+                          <label className="block text-xs text-muted-foreground mb-1">{typeConfig.quantityLabel}</label>
                           <input type="number" step="0.001" value={line.quantity} onChange={(e) => updateLine(truckId, 'quantity', e.target.value)}
-                            className="w-full border border-gray-300 rounded-lg px-2 py-1.5 text-sm" />
+                            className="w-full bg-secondary ring-1 ring-border rounded-lg px-2 py-1.5 text-sm text-foreground" />
                         </div>
                       )}
                       <div>
-                        <label className="block text-xs text-gray-500 mb-1">{typeConfig.rateLabel}</label>
+                        <label className="block text-xs text-muted-foreground mb-1">{typeConfig.rateLabel}</label>
                         <input type="number" step="0.01" value={line.rate} onChange={(e) => updateLine(truckId, 'rate', e.target.value)}
-                          className="w-full border border-gray-300 rounded-lg px-2 py-1.5 text-sm" />
+                          className="w-full bg-secondary ring-1 ring-border rounded-lg px-2 py-1.5 text-sm text-foreground" />
                       </div>
                       {invoiceType === 'advance' && (
                         <div>
-                          <label className="block text-xs text-gray-500 mb-1">Percentage (%)</label>
+                          <label className="block text-xs text-muted-foreground mb-1">Percentage (%)</label>
                           <input type="number" step="0.01" max="100" value={line.percentage} onChange={(e) => updateLine(truckId, 'percentage', e.target.value)}
-                            className="w-full border border-gray-300 rounded-lg px-2 py-1.5 text-sm" />
+                            className="w-full bg-secondary ring-1 ring-border rounded-lg px-2 py-1.5 text-sm text-foreground" />
                         </div>
                       )}
                       <div className="flex items-end">
-                        <div className="bg-blue-50 rounded-lg px-3 py-2 text-sm w-full flex justify-between">
-                          <span className="text-blue-700">Amount</span>
-                          <span className="font-bold text-blue-800">${computeAmount(truckId).toLocaleString()}</span>
+                        <div className="bg-brand/10 ring-1 ring-brand/20 rounded-lg px-3 py-2 text-sm w-full flex justify-between">
+                          <span className="text-brand">Amount</span>
+                          <span className="font-semibold text-brand">${computeAmount(truckId).toLocaleString()}</span>
                         </div>
                       </div>
                     </div>
@@ -408,13 +408,13 @@ function InvoiceForm({ invoice, onSaved }: InvoiceFormProps) {
         })}
       </div>
 
-      <div className="bg-gray-50 rounded-lg p-3 mb-6 flex justify-between items-center">
-        <span className="text-sm font-medium text-gray-600">Total Amount</span>
-        <span className="text-lg font-bold text-gray-800">$ {total.toLocaleString()}</span>
+      <div className="bg-surface rounded-lg p-3 mb-6 flex justify-between items-center ring-1 ring-white/5">
+        <span className="text-sm font-medium text-muted-foreground">Total Amount</span>
+        <span className="text-lg font-semibold text-foreground">$ {total.toLocaleString()}</span>
       </div>
 
       <button type="submit" disabled={isSubmitting}
-        className="w-full bg-blue-600 text-white py-2.5 rounded-lg font-medium hover:bg-blue-700 transition-colors disabled:opacity-50 flex items-center justify-center gap-2">
+        className="w-full bg-brand text-brand-foreground py-2.5 rounded-lg font-medium hover:opacity-90 transition-opacity disabled:opacity-50 flex items-center justify-center gap-2">
         {isSubmitting && <Loader2 size={16} className="animate-spin" />}
         {isSubmitting ? 'Saving...' : isEditMode ? 'Update Invoice' : `Create ${typeConfig.label} Invoice`}
       </button>

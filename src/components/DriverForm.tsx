@@ -77,43 +77,43 @@ function DriverForm({ driver, onSaved }: DriverFormProps) {
   return (
     <form onSubmit={handleSubmit}>
       {error && (
-        <div className="bg-red-50 text-red-700 text-sm rounded-lg p-3 mb-4 border border-red-100">{error}</div>
+        <div className="bg-destructive/10 text-destructive text-sm rounded-lg p-3 mb-4 ring-1 ring-destructive/20">{error}</div>
       )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Full Name (as on passport)</label>
+          <label className="block text-sm font-medium text-foreground mb-1">Full Name (as on passport)</label>
           <input type="text" value={fullName} onChange={(e) => setFullName(e.target.value)} required
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
+            className="w-full bg-secondary ring-1 ring-border rounded-lg px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-brand" />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
+          <label className="block text-sm font-medium text-foreground mb-1">Phone Number</label>
           <input type="text" value={phone} onChange={(e) => setPhone(e.target.value)}
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
+            className="w-full bg-secondary ring-1 ring-border rounded-lg px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-brand" />
         </div>
       </div>
 
-      <h3 className="text-sm font-bold text-gray-600 mb-3">Documents</h3>
+      <h3 className="text-sm font-semibold text-foreground mb-3">Documents</h3>
       <div className="space-y-3 mb-6">
         {DRIVER_DOCUMENT_TYPES.map(({ key, label }) => (
-          <div key={key} className="bg-gray-50 rounded-lg p-3">
-            <p className="text-sm font-medium text-gray-700 mb-2">{label}</p>
+          <div key={key} className="bg-surface rounded-lg p-3 ring-1 ring-white/5">
+            <p className="text-sm font-medium text-foreground mb-2">{label}</p>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
               <div>
-                <label className="block text-xs text-gray-500 mb-1">Number</label>
+                <label className="block text-xs text-muted-foreground mb-1">Number</label>
                 <input type="text" value={docs[key].number} onChange={(e) => updateDoc(key, 'number', e.target.value)}
-                  className="w-full border border-gray-300 rounded-lg px-2 py-1.5 text-sm" />
+                  className="w-full bg-secondary ring-1 ring-border rounded-lg px-2 py-1.5 text-sm text-foreground" />
               </div>
               <div>
-                <label className="block text-xs text-gray-500 mb-1">Due Date</label>
+                <label className="block text-xs text-muted-foreground mb-1">Due Date</label>
                 <input type="date" value={docs[key].expiryDate} onChange={(e) => updateDoc(key, 'expiryDate', e.target.value)}
-                  className="w-full border border-gray-300 rounded-lg px-2 py-1.5 text-sm" />
+                  className="w-full bg-secondary ring-1 ring-border rounded-lg px-2 py-1.5 text-sm text-foreground" />
               </div>
               <div>
-                <label className="block text-xs text-gray-500 mb-1">
+                <label className="block text-xs text-muted-foreground mb-1">
                   Attachment {docs[key].attachment === null && isEditMode && '(leave blank to keep existing)'}
                 </label>
-                <input type="file" onChange={(e) => updateDoc(key, 'attachment', e.target.files?.[0] ?? null)} className="w-full text-xs" />
+                <input type="file" onChange={(e) => updateDoc(key, 'attachment', e.target.files?.[0] ?? null)} className="w-full text-xs text-muted-foreground" />
               </div>
             </div>
           </div>
@@ -121,7 +121,7 @@ function DriverForm({ driver, onSaved }: DriverFormProps) {
       </div>
 
       <button type="submit" disabled={isSubmitting}
-        className="w-full bg-blue-600 text-white py-2.5 rounded-lg font-medium hover:bg-blue-700 transition-colors disabled:opacity-50 flex items-center justify-center gap-2">
+        className="w-full bg-brand text-brand-foreground py-2.5 rounded-lg font-medium hover:opacity-90 transition-opacity disabled:opacity-50 flex items-center justify-center gap-2">
         {isSubmitting && <Loader2 size={16} className="animate-spin" />}
         {isSubmitting ? 'Saving...' : isEditMode ? 'Update Driver' : 'Save Driver'}
       </button>

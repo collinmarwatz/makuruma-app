@@ -49,55 +49,55 @@ function ClientForm({ client, onSaved }: ClientFormProps) {
   return (
     <form onSubmit={handleSubmit}>
       {error && (
-        <div className="bg-red-50 text-red-700 text-sm rounded-lg p-3 mb-4 border border-red-100">{error}</div>
+        <div className="bg-destructive/10 text-destructive text-sm rounded-lg p-3 mb-4 ring-1 ring-destructive/20">{error}</div>
       )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Company Name</label>
+          <label className="block text-sm font-medium text-foreground mb-1">Company Name</label>
           <input
             type="text"
             value={companyName}
             onChange={(e) => setCompanyName(e.target.value)}
             required
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full bg-secondary ring-1 ring-border rounded-lg px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-brand"
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Short Code</label>
+          <label className="block text-sm font-medium text-foreground mb-1">Short Code</label>
           <input
             type="text"
             value={shortCode}
             onChange={(e) => setShortCode(e.target.value.toUpperCase())}
             maxLength={5}
             placeholder="e.g. ALI"
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm uppercase focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full bg-secondary ring-1 ring-border rounded-lg px-3 py-2 text-sm text-foreground uppercase focus:outline-none focus:ring-2 focus:ring-brand"
           />
-          <p className="text-xs text-gray-400 mt-1">Used to generate Booking IDs — must be unique</p>
+          <p className="text-xs text-muted-foreground mt-1">Used to generate Booking IDs — must be unique</p>
         </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+          <label className="block text-sm font-medium text-foreground mb-1">Email</label>
           <input
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full bg-secondary ring-1 ring-border rounded-lg px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-brand"
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Phone (Key Personnel)</label>
+          <label className="block text-sm font-medium text-foreground mb-1">Phone (Key Personnel)</label>
           <input
             type="text"
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full bg-secondary ring-1 ring-border rounded-lg px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-brand"
           />
         </div>
         <div className="mb-6">
-  <label className="flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
+  <label className="flex items-center gap-2 text-sm text-foreground cursor-pointer">
     <input
       type="checkbox"
       checked={allowsAdvanceInvoice}
@@ -106,7 +106,7 @@ function ClientForm({ client, onSaved }: ClientFormProps) {
     />
     Allow Advance Invoices for this client
   </label>
-  <p className="text-xs text-gray-400 mt-1 ml-6">
+  <p className="text-xs text-muted-foreground mt-1 ml-6">
     Only clients with this enabled can be issued an Advance-type invoice.
   </p>
 </div>
@@ -115,7 +115,7 @@ function ClientForm({ client, onSaved }: ClientFormProps) {
       <button
         type="submit"
         disabled={isSubmitting}
-        className="w-full bg-blue-600 text-white py-2.5 rounded-lg font-medium hover:bg-blue-700 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+        className="w-full bg-brand text-brand-foreground py-2.5 rounded-lg font-medium hover:opacity-90 transition-opacity disabled:opacity-50 flex items-center justify-center gap-2"
       >
         {isSubmitting && <Loader2 size={16} className="animate-spin" />}
         {isSubmitting ? 'Saving...' : isEditMode ? 'Update Client' : 'Save Client'}

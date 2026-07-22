@@ -10,9 +10,9 @@ interface UserTableProps {
 
 function UserTable({ users, onEdit, onDelete }: UserTableProps) {
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-x-auto">
+    <div className="bg-card rounded-xl ring-1 ring-white/5 overflow-x-auto">
       <table className="min-w-full text-sm">
-        <thead className="bg-gray-50 text-left text-gray-500 uppercase text-xs tracking-wide">
+        <thead className="bg-surface-2 text-left text-muted-foreground uppercase text-xs tracking-wider">
           <tr>
             <th className="px-4 py-3">Full Name</th>
             <th className="px-4 py-3">Phone Number</th>
@@ -22,12 +22,12 @@ function UserTable({ users, onEdit, onDelete }: UserTableProps) {
             <th className="px-4 py-3 text-right">Actions</th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-gray-100">
+        <tbody className="divide-y divide-hairline">
           {users.map((user) => (
-            <tr key={user.id} className="hover:bg-gray-50 transition-colors">
-              <td className="px-4 py-3 font-medium text-gray-800">{user.name}</td>
-              <td className="px-4 py-3 text-gray-600">{user.phone ?? '—'}</td>
-              <td className="px-4 py-3 text-gray-600">{user.email}</td>
+            <tr key={user.id} className="hover:bg-surface transition-colors">
+              <td className="px-4 py-3 font-medium text-foreground">{user.name}</td>
+              <td className="px-4 py-3 text-muted-foreground">{user.phone ?? '—'}</td>
+              <td className="px-4 py-3 text-muted-foreground">{user.email}</td>
               <td className="px-4 py-3">
                 <Badge label={user.role?.name ?? 'No role'} color={user.role ? 'gray' : 'yellow'} />
               </td>
@@ -38,14 +38,14 @@ function UserTable({ users, onEdit, onDelete }: UserTableProps) {
                 <div className="flex justify-end gap-2">
                   <button
                     onClick={() => onEdit(user)}
-                    className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                    className="p-1.5 text-muted-foreground hover:text-brand hover:bg-brand/10 rounded-lg transition-colors"
                     title="Edit user"
                   >
                     <Pencil size={16} />
                   </button>
                   <button
                     onClick={() => onDelete(user)}
-                    className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                    className="p-1.5 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-lg transition-colors"
                     title="Delete user"
                   >
                     <Trash2 size={16} />
@@ -58,7 +58,7 @@ function UserTable({ users, onEdit, onDelete }: UserTableProps) {
       </table>
 
       {users.length === 0 && (
-        <div className="text-center py-12 text-gray-400 text-sm">
+        <div className="text-center py-12 text-muted-foreground text-sm">
           No users added yet. Click "Add User" to get started.
         </div>
       )}

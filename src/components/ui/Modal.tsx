@@ -12,21 +12,13 @@ function Modal({ isOpen, onClose, title, children }: ModalProps) {
   if (!isOpen) return null
 
   return (
-    <div
-      className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50"
-      onClick={onClose}
-    >
-      <div
-        className="bg-white rounded-xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 sticky top-0 bg-white rounded-t-xl">
-          <h2 className="text-lg font-bold text-gray-800">{title}</h2>
-          <button
-            onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 transition-colors"
-          >
-            <X size={20} />
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div className="fixed inset-0 bg-black/70" onClick={onClose} />
+      <div className="relative bg-card rounded-xl ring-1 ring-white/10 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+        <div className="sticky top-0 bg-card border-b border-hairline px-6 py-4 flex items-center justify-between">
+          <h2 className="text-lg font-semibold text-foreground">{title}</h2>
+          <button onClick={onClose} className="p-1.5 text-muted-foreground hover:text-foreground hover:bg-surface rounded-lg transition-colors">
+            <X size={18} />
           </button>
         </div>
         <div className="p-6">{children}</div>
